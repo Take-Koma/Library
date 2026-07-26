@@ -1,4 +1,90 @@
 <?xml version="1.0"?>
 <TcSmProject xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://www.beckhoff.com/schemas/2012/07/TcSmProject" TcSmVersion="1.0" TcVersion="3.1.4026.24">
-	<Project ProjectGUID="{03A032F9-B6D2-8CC4-9E6B-69F13C79B4D2}" Target64Bit="true" ShowHideConfigurations="#x6"/>
+	<Translations>
+		<Text TxtId="WagoCp7871664000080EventClass">
+			<Text LcId="1041"><![CDATA[Wagoサーキットプロテクタ7871664000080イベントクラス]]></Text>
+		</Text>
+		<Text TxtId="InputVoltageAlarm( {0} V)">
+			<Text LcId="1041"><![CDATA[入力電圧異常( {0} V)]]></Text>
+		</Text>
+		<Text TxtId="TrippedHardwareError ( {0} ch)">
+			<Text LcId="1041"><![CDATA[ハードウェアヒューズ異常 ( {0} ch)]]></Text>
+		</Text>
+		<Text TxtId="Tripped ( {0} ch)">
+			<Text LcId="1041"><![CDATA[トリップ ( {0} ch)]]></Text>
+		</Text>
+		<Text TxtId="OverloadOver100Percent ( {0} ch)">
+			<Text LcId="1041"><![CDATA[負荷100%超え ( {0} ch)]]></Text>
+		</Text>
+		<Text TxtId="OverloadOver90Percent ( {0} ch)">
+			<Text LcId="1041"><![CDATA[負荷90%超え ( {0} ch)]]></Text>
+		</Text>
+		<Text TxtId="SwitchedOffLocalOrRemote ( {0} ch)">
+			<Text LcId="1041"><![CDATA[ローカルまたはリモートOFF ( {0} ch)]]></Text>
+		</Text>
+	</Translations>
+	<DataTypes>
+		<DataType>
+			<Name GUID="{EDFB3162-9B97-4CB3-B53E-A74241B9C4F2}" PersistentType="true">NewEventClass</Name>
+			<DisplayName TxtId=""><![CDATA[NewEventClass_DisplayText]]></DisplayName>
+			<EventId>
+				<Name Id="1">Event</Name>
+				<DisplayName TxtId=""><![CDATA[Event_DisplayText]]></DisplayName>
+				<Severity>Verbose</Severity>
+			</EventId>
+		</DataType>
+		<DataType>
+			<Name GUID="{9A49E6FD-DB6B-4A37-B685-ABD6337144C7}" PersistentType="true">TkWagoCp7871664000080EventClass</Name>
+			<DisplayName TxtId=""><![CDATA[WagoCp7871664000080EventClass]]></DisplayName>
+			<EventId>
+				<Name Id="1">InputVoltageAlarm</Name>
+				<DisplayName TxtId=""><![CDATA[InputVoltageAlarm( {0} V)]]></DisplayName>
+				<Severity>Error</Severity>
+			</EventId>
+			<EventId>
+				<Name Id="2">TrippedHardwareError</Name>
+				<DisplayName TxtId=""><![CDATA[TrippedHardwareError ( {0} ch)]]></DisplayName>
+				<Severity>Error</Severity>
+			</EventId>
+			<EventId>
+				<Name Id="3">Tripped</Name>
+				<DisplayName TxtId=""><![CDATA[Tripped ( {0} ch)]]></DisplayName>
+				<Severity>Error</Severity>
+			</EventId>
+			<EventId>
+				<Name Id="4">OverloadOver100Percent</Name>
+				<DisplayName TxtId=""><![CDATA[OverloadOver100Percent ( {0} ch)]]></DisplayName>
+				<Severity>Warning</Severity>
+			</EventId>
+			<EventId>
+				<Name Id="5">OverloadOver90Percent</Name>
+				<DisplayName TxtId=""><![CDATA[OverloadOver90Percent ( {0} ch)]]></DisplayName>
+				<Severity>Warning</Severity>
+			</EventId>
+			<EventId>
+				<Name Id="6">SwitchedOffLocalOrRemote</Name>
+				<DisplayName TxtId=""><![CDATA[SwitchedOffLocalOrRemote ( {0} ch)]]></DisplayName>
+				<Severity>Info</Severity>
+			</EventId>
+			<Hides>
+				<Hide GUID="{B4A8F2D9-1756-4BC3-A81A-85D22039D5B5}"/>
+				<Hide GUID="{EC11165F-C04B-47AA-8D7E-35283CE92190}"/>
+				<Hide GUID="{1B58B559-14B5-45B1-A076-F2F7671E117E}"/>
+				<Hide GUID="{7831230E-5F6A-49E9-8479-9A043E9A120C}"/>
+				<Hide GUID="{2F2ED372-BA59-4CCD-A011-A674D4B8EE03}"/>
+				<Hide GUID="{CB9AD64E-2270-4DCB-92B4-6C44869E5D1E}"/>
+				<Hide GUID="{63B17D0E-1819-49B4-8073-F1562B82FF9A}"/>
+				<Hide GUID="{D7F892AA-90E4-4349-A9AF-DC3C0EDE335E}"/>
+				<Hide GUID="{EA55094E-C604-4DA3-A0FA-4BC4D5DD7AD8}"/>
+				<Hide GUID="{3CAF96C0-A260-4017-842B-C4D438424C6C}"/>
+				<Hide GUID="{3C1995E3-0B5E-4563-92BB-C7ECDCE71B69}"/>
+				<Hide GUID="{05D6B336-5EB0-401F-8C0F-302996A1FF9E}"/>
+			</Hides>
+		</DataType>
+	</DataTypes>
+	<Project ProjectGUID="{03A032F9-B6D2-8CC4-9E6B-69F13C79B4D2}" Target64Bit="true" ShowHideConfigurations="#x6">
+		<Plc>
+			<Project File="Wago7871664000080.xti"/>
+		</Plc>
+	</Project>
 </TcSmProject>
