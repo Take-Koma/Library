@@ -273,6 +273,11 @@ __pycache__/
 *.tclrs
 *.library
 *.compiled-library
+
+# ★ compiled-library フォルダ配下のファイルは例外としてGit管理に含める
+!compiled-library/
+!compiled-library/**
+
 *.compileinfo
 *.asm
 *.core
