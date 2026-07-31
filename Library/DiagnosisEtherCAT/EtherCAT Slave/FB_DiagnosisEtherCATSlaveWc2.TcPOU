@@ -1,0 +1,56 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1">
+  <POU Name="FB_DiagnosisEtherCATSlaveWc2" Id="{43d062e3-fee5-42c2-9ca9-d2a3a2982dac}" SpecialFunc="None">
+    <Declaration><![CDATA[FUNCTION_BLOCK FB_DiagnosisEtherCATSlaveWc2 IMPLEMENTS I_DiagnosisEtherCATSlave
+VAR_INPUT
+	sSlaveName					:STRING	:='NameNotSet';				//スレーブ名
+END_VAR
+VAR
+	_bError						:BOOL;
+	
+	fbStateDiagnosis			:FB_StateDiagnosis;
+	fbWcStateDiagnosis1			:FB_WcStateDiagnosis;
+	fbWcStateDiagnosis2			:FB_WcStateDiagnosis;
+END_VAR
+]]></Declaration>
+    <Implementation>
+      <ST><![CDATA[]]></ST>
+    </Implementation>
+    <Property Name="bError" Id="{65139e7b-585f-4c34-9ae7-09df7cc57b61}">
+      <Declaration><![CDATA[(*エラー発生を出力*)
+PROPERTY bError : BOOL
+]]></Declaration>
+      <Get Name="Get" Id="{3ec7d4f6-88ca-4377-9ea0-a8a8a53beebf}">
+        <Declaration><![CDATA[VAR
+END_VAR
+]]></Declaration>
+        <Implementation>
+          <ST><![CDATA[bError:=_bError;]]></ST>
+        </Implementation>
+      </Get>
+    </Property>
+    <Method Name="Execute" Id="{0d918983-498a-4571-930d-74f126bea5ae}">
+      <Declaration><![CDATA[(*呼び出して診断実行*)
+METHOD Execute
+]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[//診断用FBを呼び出し
+fbStateDiagnosis(sSlaveName:=sSlaveName);
+fbWcStateDiagnosis1(sSlaveName:=sSlaveName);
+fbWcStateDiagnosis2(sSlaveName:=sSlaveName);
+
+_bError:=fbStateDiagnosis.bError OR fbWcStateDiagnosis1.bError OR fbWcStateDiagnosis2.bError;
+]]></ST>
+      </Implementation>
+    </Method>
+    <LineIds Name="FB_DiagnosisEtherCATSlaveWc2">
+      <LineId Id="2" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_DiagnosisEtherCATSlaveWc2.bError.Get">
+      <LineId Id="1" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_DiagnosisEtherCATSlaveWc2.Execute">
+      <LineId Id="1" Count="6" />
+    </LineIds>
+  </POU>
+</TcPlcObject>

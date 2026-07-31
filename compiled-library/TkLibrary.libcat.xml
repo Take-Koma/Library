@@ -13,4 +13,12 @@
         </ParentCategory>
         <DefaultName>Utility</DefaultName>
     </LibraryCategory>
+    <LibraryCategory>
+        <Id>a30025f5-4ecd-4f26-adb5-172022701ca1</Id>
+        <Version>1.0.0.0</Version>
+        <ParentCategory>
+            <Id>b2bead5f-b1f9-49aa-b5bf-fdbc3c974d60</Id>
+        </ParentCategory>
+        <DefaultName>Diagnosis</DefaultName>
+    </LibraryCategory>
 </LibraryCategories>

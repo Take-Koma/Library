@@ -3,33 +3,32 @@
   <PropertyGroup>
     <FileVersion>1.0.0.0</FileVersion>
     <SchemaVersion>2.0</SchemaVersion>
-    <ProjectGuid>{3dc0f191-a80e-4c80-846e-de69ffd142cc}</ProjectGuid>
-    <SubObjectsSortedByName>True</SubObjectsSortedByName>
+    <ProjectGuid>{bc4ecb86-b776-4b0a-bdc9-b779fe95f5c9}</ProjectGuid>
+    <SubObjectsSortedByName>true</SubObjectsSortedByName>
     <DownloadApplicationInfo>true</DownloadApplicationInfo>
-    <WriteProductVersion>true</WriteProductVersion>
+    <WriteProductVersion>false</WriteProductVersion>
     <GenerateTpy>false</GenerateTpy>
-    <Name>Wago7871664000080</Name>
+    <Name>DiagnosisEtherCAT</Name>
     <ProgramVersion>3.1.4026.25</ProgramVersion>
-    <Application>{07089afc-52bf-40c3-98ec-f17ce6ec1b56}</Application>
-    <TypeSystem>{85c5b9a1-87aa-490b-976c-27b821f03967}</TypeSystem>
-    <Implicit_Task_Info>{6c0da750-613e-4374-8b71-de102db60f82}</Implicit_Task_Info>
-    <Implicit_KindOfTask>{025e7440-a119-463c-ad07-a3a8cfb8b6b0}</Implicit_KindOfTask>
-    <Implicit_Jitter_Distribution>{4237d573-82f9-4103-b1bd-b92684921531}</Implicit_Jitter_Distribution>
-    <LibraryReferences>{5c952965-9a56-492b-aedf-ca63ae3f6802}</LibraryReferences>
-    <Released>false</Released>
+    <Application>{336ef8b7-2f21-49e7-aaf7-7ea1a3efbc46}</Application>
+    <TypeSystem>{f1c62d18-462c-415c-a1d2-e53cc8c1de44}</TypeSystem>
+    <Implicit_Task_Info>{7fbb35ea-bfa2-40e2-b7ef-ea90532f20e1}</Implicit_Task_Info>
+    <Implicit_KindOfTask>{08302542-b32f-46e8-96bb-7abebd8cbccd}</Implicit_KindOfTask>
+    <Implicit_Jitter_Distribution>{207763a1-041f-46f7-a0dd-8ccd193e19a9}</Implicit_Jitter_Distribution>
+    <LibraryReferences>{5cea3580-ef9d-4137-a056-8c49bc37ba59}</LibraryReferences>
     <Company>Komatsu</Company>
-    <Title>Tk_Wago_787-1664_000-080</Title>
+    <Released>false</Released>
+    <Title>Tk_Diagnosis_EtherCAT</Title>
     <Author>TK</Author>
-    <ProjectVersion>1.0.2.1</ProjectVersion>
-    <Description>wagoの787-1664/000-080で使用するライブラリーです。</Description>
+    <ProjectVersion>0.0.7.0</ProjectVersion>
     <LibraryCategories>
       <LibraryCategory xmlns="">
-        <Id>{49ec1d53-f326-478b-a197-fd99d160cfe3}</Id>
+        <Id>{a30025f5-4ecd-4f26-adb5-172022701ca1}</Id>
         <Version>1.0.0.0</Version>
         <ParentCategory>
           <Id>{b2bead5f-b1f9-49aa-b5bf-fdbc3c974d60}</Id>
         </ParentCategory>
-        <DefaultName>Utility</DefaultName>
+        <DefaultName>Diagnosis</DefaultName>
       </LibraryCategory>
       <LibraryCategory xmlns="">
         <Id>{b2bead5f-b1f9-49aa-b5bf-fdbc3c974d60}</Id>
@@ -38,22 +37,17 @@
       </LibraryCategory>
     </LibraryCategories>
     <SelectedLibraryCategories>
-      <Id xmlns="">{49ec1d53-f326-478b-a197-fd99d160cfe3}</Id>
+      <Id xmlns="">{a30025f5-4ecd-4f26-adb5-172022701ca1}</Id>
     </SelectedLibraryCategories>
+    <Description>EtherCATのマスター、スレーブの診断用FBのライブラリです。</Description>
+    <GlobalVersionStructureIncluded>true</GlobalVersionStructureIncluded>
   </PropertyGroup>
   <ItemGroup>
-    <Compile Include="DUTs\E_787_1664_000_080Status.TcDUT">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="POUs\FB_787_1664_000_080.TcPOU">
-      <SubType>Code</SubType>
-    </Compile>
-  </ItemGroup>
-  <ItemGroup>
-    <Folder Include="DUTs" />
-    <Folder Include="GVLs" />
-    <Folder Include="VISUs" />
-    <Folder Include="POUs" />
+    <Folder Include="EtherCAT Master" />
+    <Folder Include="EtherCAT Master\Base" />
+    <Folder Include="EtherCAT Slave" />
+    <Folder Include="EtherCAT Slave\Base" />
+    <Folder Include="Version" />
   </ItemGroup>
   <ItemGroup>
     <PlaceholderReference Include="Tc2_Standard">
@@ -68,10 +62,6 @@
       <DefaultResolution>Tc3_EventLogger, * (Beckhoff Automation GmbH)</DefaultResolution>
       <Namespace>Tc3_EventLogger</Namespace>
     </PlaceholderReference>
-    <PlaceholderReference Include="Tc3_IoLink">
-      <DefaultResolution>Tc3_IoLink, * (Beckhoff Automation GmbH)</DefaultResolution>
-      <Namespace>Tc3_IoLink</Namespace>
-    </PlaceholderReference>
     <PlaceholderReference Include="Tc3_Module">
       <DefaultResolution>Tc3_Module, * (Beckhoff Automation GmbH)</DefaultResolution>
       <Namespace>Tc3_Module</Namespace>
@@ -79,7 +69,45 @@
     </PlaceholderReference>
   </ItemGroup>
   <ItemGroup>
-    <None Include="Wago7871664000080.tmc">
+    <Compile Include="EtherCAT Master\Base\FB_DevStateDiagnosis.TcPOU">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="EtherCAT Master\Base\FB_FrmStateDiagnosis.TcPOU">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="EtherCAT Master\Base\FB_FrmWcStateDiagnosis.TcPOU">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="EtherCAT Master\Base\FB_SlaveCountDiagnosis.TcPOU">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="EtherCAT Master\FB_DiagnosisEtherCATMaster.TcPOU">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="EtherCAT Slave\Base\FB_StateDiagnosis.TcPOU">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="EtherCAT Slave\Base\FB_WcStateDiagnosis.TcPOU">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="EtherCAT Slave\FB_DiagnosisEtherCATSlaveWc0.TcPOU">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="EtherCAT Slave\FB_DiagnosisEtherCATSlaveWc1.TcPOU">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="EtherCAT Slave\FB_DiagnosisEtherCATSlaveWc2.TcPOU">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="EtherCAT Slave\I_DiagnosisEtherCATSlave.TcIO">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Version\Global_Version.TcGVL">
+      <SubType>Code</SubType>
+    </Compile>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="DiagnosisEtherCAT.tmc">
       <SubType>Content</SubType>
     </None>
   </ItemGroup>
@@ -91,8 +119,8 @@
   <ProjectExtensions>
     <PlcProjectOptions>
       <XmlArchive>
-  <Data>
-    <o xml:space="preserve" t="OptionKey">
+        <Data>
+          <o xml:space="preserve" t="OptionKey">
       <v n="Name">"&lt;ProjectRoot&gt;"</v>
       <d n="SubKeys" t="Hashtable" ckt="String" cvt="OptionKey">
         <v>{192FAD59-8248-4824-A8DE-9177C94C195A}</v>
@@ -168,14 +196,14 @@
       </d>
       <d n="Values" t="Hashtable" />
     </o>
-  </Data>
-  <TypeList>
-    <Type n="Boolean">System.Boolean</Type>
-    <Type n="Hashtable">System.Collections.Hashtable</Type>
-    <Type n="OptionKey">{54dd0eac-a6d8-46f2-8c27-2f43c7e49861}</Type>
-    <Type n="String">System.String</Type>
-  </TypeList>
-</XmlArchive>
+        </Data>
+        <TypeList>
+          <Type n="Boolean">System.Boolean</Type>
+          <Type n="Hashtable">System.Collections.Hashtable</Type>
+          <Type n="OptionKey">{54dd0eac-a6d8-46f2-8c27-2f43c7e49861}</Type>
+          <Type n="String">System.String</Type>
+        </TypeList>
+      </XmlArchive>
     </PlcProjectOptions>
   </ProjectExtensions>
 </Project>

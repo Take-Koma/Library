@@ -1,0 +1,21 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1">
+  <Itf Name="I_DiagnosisEtherCATSlave" Id="{090ab407-e917-4381-989f-025f06abcb34}">
+    <Declaration><![CDATA[INTERFACE I_DiagnosisEtherCATSlave
+]]></Declaration>
+    <Property Name="bError" Id="{cc5a4ad7-70c3-43c2-9131-4ee25fdc5989}">
+      <Declaration><![CDATA[//エラー発生を出力
+PROPERTY bError : BOOL]]></Declaration>
+      <Get Name="Get" Id="{12caa3ea-629a-4514-8762-74b9502c71f0}">
+        <Declaration><![CDATA[]]></Declaration>
+      </Get>
+    </Property>
+    <Method Name="Execute" Id="{e8bb91c4-88c5-42df-a91d-5249e670b9c9}">
+      <Declaration><![CDATA[//呼び出して診断実行
+METHOD Execute
+VAR_INPUT
+END_VAR
+]]></Declaration>
+    </Method>
+  </Itf>
+</TcPlcObject>

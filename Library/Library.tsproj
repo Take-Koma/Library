@@ -1,5 +1,5 @@
 <?xml version="1.0"?>
-<TcSmProject xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://www.beckhoff.com/schemas/2012/07/TcSmProject" TcSmVersion="1.0" TcVersion="3.1.4026.24">
+<TcSmProject xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://www.beckhoff.com/schemas/2012/07/TcSmProject" TcSmVersion="1.0" TcVersion="3.1.4026.25">
 	<Translations>
 		<Text TxtId="WagoCp7871664000080EventClass">
 			<Text LcId="1041"><![CDATA[Wagoサーキットプロテクタ7871664000080イベントクラス]]></Text>
@@ -21,6 +21,122 @@
 		</Text>
 		<Text TxtId="SwitchedOffLocalOrRemote ( {0} ch)">
 			<Text LcId="1041"><![CDATA[ローカルまたはリモートOFF ( {0} ch)]]></Text>
+		</Text>
+		<Text TxtId="TkEtherCATSlaveDiagnosisEventClass">
+			<Text LcId="1033"><![CDATA[EtherCATSlaveDiagnosisEventClass]]></Text>
+			<Text LcId="1041"><![CDATA[EtherCATスレーブ診断イベントクラス]]></Text>
+		</Text>
+		<Text TxtId="INIT (Slave: {0} )">
+			<Text LcId="1041"><![CDATA[INIT（初期化） (Slave: {0} )]]></Text>
+		</Text>
+		<Text TxtId="PREOP (Slave: {0} )">
+			<Text LcId="1041"><![CDATA[PREOP（事前動作） (Slave: {0} )]]></Text>
+		</Text>
+		<Text TxtId="BOOT (Slave: {0} )">
+			<Text LcId="1041"><![CDATA[BOOT（ブート） (Slave: {0} )]]></Text>
+		</Text>
+		<Text TxtId="SAFEOP (Slave: {0} )">
+			<Text LcId="1041"><![CDATA[SAFEOP（安全動作） (Slave: {0} )]]></Text>
+		</Text>
+		<Text TxtId="OP (Slave: {0} )">
+			<Text LcId="1041"><![CDATA[OP（動作） (Slave: {0} )]]></Text>
+		</Text>
+		<Text TxtId="Slave signals error (Slave: {0} )">
+			<Text LcId="1041"><![CDATA[スレーブがエラーを通知 (Slave: {0} )]]></Text>
+		</Text>
+		<Text TxtId="Invalid vendorId, productCode... read (Slave: {0} )">
+			<Text LcId="1041"><![CDATA[無効なvendorId、productCode...の読み出し (Slave: {0} )]]></Text>
+		</Text>
+		<Text TxtId="Initialization error occurred (Slave: {0} )">
+			<Text LcId="1041"><![CDATA[初期化エラーが発生 (Slave: {0} )]]></Text>
+		</Text>
+		<Text TxtId="Slave disabled (Slave: {0} )">
+			<Text LcId="1041"><![CDATA[スレーブが無効化されています (Slave: {0} )]]></Text>
+		</Text>
+		<Text TxtId="Slave not present (Slave: {0} )">
+			<Text LcId="1041"><![CDATA[スレーブが存在しません (Slave: {0} )]]></Text>
+		</Text>
+		<Text TxtId="Slave signals link error (Slave: {0} )">
+			<Text LcId="1041"><![CDATA[スレーブがリンクエラーを通知 (Slave: {0} )]]></Text>
+		</Text>
+		<Text TxtId="Slave signals missing link (Slave: {0} )">
+			<Text LcId="1041"><![CDATA[スレーブがリンク未接続を通知 (Slave: {0} )]]></Text>
+		</Text>
+		<Text TxtId="Slave Slave signals unexpected link (Slave: {0} )">
+			<Text LcId="1041"><![CDATA[スレーブが予期しないリンクを通知 (Slave: {0} )]]></Text>
+		</Text>
+		<Text TxtId="Communication port A (Slave: {0} )">
+			<Text LcId="1041"><![CDATA[通信ポートA (Slave: {0} )]]></Text>
+		</Text>
+		<Text TxtId="Communication port B (Slave: {0} )">
+			<Text LcId="1041"><![CDATA[通信ポートB (Slave: {0} )]]></Text>
+		</Text>
+		<Text TxtId="Communication port C (Slave: {0} )">
+			<Text LcId="1041"><![CDATA[通信ポートC (Slave: {0} )]]></Text>
+		</Text>
+		<Text TxtId="Communication port D (Slave: {0} )">
+			<Text LcId="1041"><![CDATA[通信ポートD (Slave: {0} )]]></Text>
+		</Text>
+		<Text TxtId="Invalid Working Counter (Slave: {0} )">
+			<Text LcId="1041"><![CDATA[無効なワーキングカウンター (Slave: {0} )]]></Text>
+		</Text>
+		<Text TxtId="TkEtherCATMasterDiagnosisEventClass">
+			<Text LcId="1033"><![CDATA[EtherCATMasterDiagnosisEventClass]]></Text>
+			<Text LcId="1041"><![CDATA[EtherCATマスタ診断イベントクラス]]></Text>
+		</Text>
+		<Text TxtId="Link error (Master: {0} )">
+			<Text LcId="1041"><![CDATA[リンクエラー (Master: {0} )]]></Text>
+		</Text>
+		<Text TxtId="I/O locked after link error (I/O reset required) (Master: {0} )">
+			<Text LcId="1041"><![CDATA[リンクエラー後のI/Oロック（I/Oリセットが必要） (Master: {0} )]]></Text>
+		</Text>
+		<Text TxtId="Link error (redundancy adapter) (Master: {0} )">
+			<Text LcId="1041"><![CDATA[リンクエラー（冗長化アダプタ） (Master: {0} )]]></Text>
+		</Text>
+		<Text TxtId="Missing one frame (redundancy mode) (Master: {0} )">
+			<Text LcId="1041"><![CDATA[フレームの欠落（冗長化モード） (Master: {0} )]]></Text>
+		</Text>
+		<Text TxtId="Out of send resources (I/O reset required) (Master: {0} )">
+			<Text LcId="1041"><![CDATA[送信リソース不足（I/Oリセットが必要） (Master: {0} )]]></Text>
+		</Text>
+		<Text TxtId="Watchdog triggered (Master: {0} )">
+			<Text LcId="1041"><![CDATA[ウォッチドッグ作動 (Master: {0} )]]></Text>
+		</Text>
+		<Text TxtId="Ethernet driver (miniport) not found (Master: {0} )">
+			<Text LcId="1041"><![CDATA[イーサネットドライバ（ミニポート）未検出 (Master: {0} )]]></Text>
+		</Text>
+		<Text TxtId="I/O reset active (Master: {0} )">
+			<Text LcId="1041"><![CDATA[I/Oリセット実行中 (Master: {0} )]]></Text>
+		</Text>
+		<Text TxtId="At least one device in ҅INIT҆ state (Master: {0} )">
+			<Text LcId="1041"><![CDATA[少なくとも1つのデバイスが「INIT」状態 (Master: {0} )]]></Text>
+		</Text>
+		<Text TxtId="At least one device in ҅PRE-OP҆ state (Master: {0} )">
+			<Text LcId="1041"><![CDATA[少なくとも1つのデバイスが「PRE-OP」状態 (Master: {0} )]]></Text>
+		</Text>
+		<Text TxtId="At least one device in ҅SAFE-OP҆ state (Master: {0} )">
+			<Text LcId="1041"><![CDATA[少なくとも1つのデバイスが「SAFE-OP」状態 (Master: {0} )]]></Text>
+		</Text>
+		<Text TxtId="At least one device indicates an error state (Master: {0} )">
+			<Text LcId="1041"><![CDATA[少なくとも1つのデバイスがエラー状態を示している (Master: {0} )]]></Text>
+		</Text>
+		<Text TxtId="DC not in sync (Master: {0} )">
+			<Text LcId="1041"><![CDATA[DC非同期 (Master: {0} )]]></Text>
+		</Text>
+		<Text TxtId="Wrong working counter of {0} EtherCAT command received (Master: {1} )">
+			<Text LcId="1041"><![CDATA[EtherCATコマンド {0} のワーキングカウンタが不正です (Master: {1} )]]></Text>
+		</Text>
+		<Text TxtId="Complete frame missing! (Master: {0} )">
+			<Text LcId="1041"><![CDATA[フレームが完全に欠落しています (Master: {0} )]]></Text>
+		</Text>
+		<Text TxtId="{0} EtherCAT command not sent (NOP requested). (Master: {1} )">
+			<Text LcId="1041"><![CDATA[{0} EtherCATコマンドは送信されませんでした（NOPが要求されました）。 (Master: {1} )]]></Text>
+		</Text>
+		<Text TxtId="Complete frame not sent. (Master: {0} )">
+			<Text LcId="1041"><![CDATA[フレームは完全に送信されませんでした。 (Master: {0} )]]></Text>
+		</Text>
+		<Text TxtId="Mismatch brtween SlaveCount and CfgSlaveCount (Master: {0} )">
+			<Text LcId="1041"><![CDATA[設定したスレーブ数と受信したスレーブ数が不一致 (Master: {0} )]]></Text>
 		</Text>
 	</Translations>
 	<DataTypes>
@@ -81,10 +197,220 @@
 				<Hide GUID="{05D6B336-5EB0-401F-8C0F-302996A1FF9E}"/>
 			</Hides>
 		</DataType>
+		<DataType>
+			<Name GUID="{2717DEA4-D6A8-4703-A887-17F68D5E8D8C}" PersistentType="true">TkEtherCATSlaveDiagnosisEventClass</Name>
+			<DisplayName TxtId=""><![CDATA[TkEtherCATSlaveDiagnosisEventClass]]></DisplayName>
+			<EventId>
+				<Name Id="#x1">INIT</Name>
+				<DisplayName TxtId=""><![CDATA[INIT (Slave: {0} )]]></DisplayName>
+				<Severity>Error</Severity>
+			</EventId>
+			<EventId>
+				<Name Id="#x2">PREOP</Name>
+				<DisplayName TxtId=""><![CDATA[PREOP (Slave: {0} )]]></DisplayName>
+				<Severity>Error</Severity>
+			</EventId>
+			<EventId>
+				<Name Id="#x3">BOOT</Name>
+				<DisplayName TxtId=""><![CDATA[BOOT (Slave: {0} )]]></DisplayName>
+				<Severity>Error</Severity>
+			</EventId>
+			<EventId>
+				<Name Id="#x4">SAFEOP</Name>
+				<DisplayName TxtId=""><![CDATA[SAFEOP (Slave: {0} )]]></DisplayName>
+				<Severity>Error</Severity>
+			</EventId>
+			<EventId>
+				<Name Id="#x8">OP</Name>
+				<DisplayName TxtId=""><![CDATA[OP (Slave: {0} )]]></DisplayName>
+				<Severity>Info</Severity>
+			</EventId>
+			<EventId>
+				<Name Id="#x10">SlaveSignalsError</Name>
+				<DisplayName TxtId=""><![CDATA[Slave signals error (Slave: {0} )]]></DisplayName>
+				<Severity>Error</Severity>
+			</EventId>
+			<EventId>
+				<Name Id="#x20">InvalidVendorIdProductCodeRead</Name>
+				<DisplayName TxtId=""><![CDATA[Invalid vendorId, productCode... read (Slave: {0} )]]></DisplayName>
+				<Severity>Error</Severity>
+			</EventId>
+			<EventId>
+				<Name Id="#x40">InitializationErrorOccurred</Name>
+				<DisplayName TxtId=""><![CDATA[Initialization error occurred (Slave: {0} )]]></DisplayName>
+				<Severity>Error</Severity>
+			</EventId>
+			<EventId>
+				<Name Id="#x80">SlaveDisabled</Name>
+				<DisplayName TxtId=""><![CDATA[Slave disabled (Slave: {0} )]]></DisplayName>
+				<Severity>Error</Severity>
+			</EventId>
+			<EventId>
+				<Name Id="#x100">SlaveNotPresent</Name>
+				<DisplayName TxtId=""><![CDATA[Slave not present (Slave: {0} )]]></DisplayName>
+				<Severity>Error</Severity>
+			</EventId>
+			<EventId>
+				<Name Id="#x200">SlaveSignalsLinkError</Name>
+				<DisplayName TxtId=""><![CDATA[Slave signals link error (Slave: {0} )]]></DisplayName>
+				<Severity>Error</Severity>
+			</EventId>
+			<EventId>
+				<Name Id="#x400">SlaveSignalsMissingLink</Name>
+				<DisplayName TxtId=""><![CDATA[Slave signals missing link (Slave: {0} )]]></DisplayName>
+				<Severity>Error</Severity>
+			</EventId>
+			<EventId>
+				<Name Id="#x800">SlaveSlaveSignalsUnexpectedLink</Name>
+				<DisplayName TxtId=""><![CDATA[Slave Slave signals unexpected link (Slave: {0} )]]></DisplayName>
+				<Severity>Error</Severity>
+			</EventId>
+			<EventId>
+				<Name Id="#x1000">CommunicationPortA</Name>
+				<DisplayName TxtId=""><![CDATA[Communication port A (Slave: {0} )]]></DisplayName>
+				<Severity>Error</Severity>
+			</EventId>
+			<EventId>
+				<Name Id="#x2000">CommunicationPortB</Name>
+				<DisplayName TxtId=""><![CDATA[Communication port B (Slave: {0} )]]></DisplayName>
+				<Severity>Error</Severity>
+			</EventId>
+			<EventId>
+				<Name Id="#x4000">CommunicationPortC</Name>
+				<DisplayName TxtId=""><![CDATA[Communication port C (Slave: {0} )]]></DisplayName>
+				<Severity>Error</Severity>
+			</EventId>
+			<EventId>
+				<Name Id="#x8000">CommunicationPortD</Name>
+				<DisplayName TxtId=""><![CDATA[Communication port D (Slave: {0} )]]></DisplayName>
+				<Severity>Error</Severity>
+			</EventId>
+			<EventId>
+				<Name Id="#x10000">InvalidWorkingCounter</Name>
+				<DisplayName TxtId=""><![CDATA[Invalid Working Counter (Slave: {0} )]]></DisplayName>
+				<Severity>Error</Severity>
+			</EventId>
+			<Hides>
+				<Hide GUID="{3B677AA0-89AD-4534-AAD9-3A856DEA8BB4}"/>
+				<Hide GUID="{F457090F-FBA1-462A-9E51-40D8FBBEBEAE}"/>
+				<Hide GUID="{7AE94FCE-E616-4EF0-ADD1-61F99922C888}"/>
+				<Hide GUID="{CDAB43A8-33C2-4A02-976D-0ACBCFAC5CD4}"/>
+				<Hide GUID="{A98275F5-46C9-460B-B657-81FA8BF46015}"/>
+				<Hide GUID="{4D4CACC4-D979-4211-BEED-15A419914339}"/>
+			</Hides>
+		</DataType>
+		<DataType>
+			<Name GUID="{ABBCF847-C6EF-4AAB-860E-6D404F961633}" PersistentType="true">TkEtherCATMasterDiagnosisEventClass</Name>
+			<DisplayName TxtId=""><![CDATA[TkEtherCATMasterDiagnosisEventClass]]></DisplayName>
+			<EventId>
+				<Name Id="#x0">LinkError</Name>
+				<DisplayName TxtId=""><![CDATA[Link error (Master: {0} )]]></DisplayName>
+				<Severity>Error</Severity>
+			</EventId>
+			<EventId>
+				<Name Id="#x1">IOLockedAfterLinkErrorIOResetRequired</Name>
+				<DisplayName TxtId=""><![CDATA[I/O locked after link error (I/O reset required) (Master: {0} )]]></DisplayName>
+				<Severity>Error</Severity>
+			</EventId>
+			<EventId>
+				<Name Id="#x2">LinkErrorRedundancyAdapter</Name>
+				<DisplayName TxtId=""><![CDATA[Link error (redundancy adapter) (Master: {0} )]]></DisplayName>
+				<Severity>Info</Severity>
+			</EventId>
+			<EventId>
+				<Name Id="#x3">MissingOneFrameRedundancyAdapter</Name>
+				<DisplayName TxtId=""><![CDATA[Missing one frame (redundancy mode) (Master: {0} )]]></DisplayName>
+				<Severity>Info</Severity>
+			</EventId>
+			<EventId>
+				<Name Id="#x4">OutOfSendResourcesIOResetRequired</Name>
+				<DisplayName TxtId=""><![CDATA[Out of send resources (I/O reset required) (Master: {0} )]]></DisplayName>
+				<Severity>Error</Severity>
+			</EventId>
+			<EventId>
+				<Name Id="#x5">WatchdogTriggered</Name>
+				<DisplayName TxtId=""><![CDATA[Watchdog triggered (Master: {0} )]]></DisplayName>
+				<Severity>Error</Severity>
+			</EventId>
+			<EventId>
+				<Name Id="#x6">EthernetDriverMiniportNotFound</Name>
+				<DisplayName TxtId=""><![CDATA[Ethernet driver (miniport) not found (Master: {0} )]]></DisplayName>
+				<Severity>Error</Severity>
+			</EventId>
+			<EventId>
+				<Name Id="#x7">IOResetActive</Name>
+				<DisplayName TxtId=""><![CDATA[I/O reset active (Master: {0} )]]></DisplayName>
+				<Severity>Error</Severity>
+			</EventId>
+			<EventId>
+				<Name Id="#x8">AtLeastOneDeviceInINITState</Name>
+				<DisplayName TxtId=""><![CDATA[At least one device in ҅INIT҆ state (Master: {0} )]]></DisplayName>
+				<Severity>Error</Severity>
+			</EventId>
+			<EventId>
+				<Name Id="#x9">AtLeastOneDeviceInPREOPState</Name>
+				<DisplayName TxtId=""><![CDATA[At least one device in ҅PRE-OP҆ state (Master: {0} )]]></DisplayName>
+				<Severity>Error</Severity>
+			</EventId>
+			<EventId>
+				<Name Id="#xA">AtLeastOneDeviceInSAFEOPState</Name>
+				<DisplayName TxtId=""><![CDATA[At least one device in ҅SAFE-OP҆ state (Master: {0} )]]></DisplayName>
+				<Severity>Error</Severity>
+			</EventId>
+			<EventId>
+				<Name Id="#xB">AtLeastOneDeviceInERRORState</Name>
+				<DisplayName TxtId=""><![CDATA[At least one device indicates an error state (Master: {0} )]]></DisplayName>
+				<Severity>Error</Severity>
+			</EventId>
+			<EventId>
+				<Name Id="#xC">DCNotInSync</Name>
+				<DisplayName TxtId=""><![CDATA[DC not in sync (Master: {0} )]]></DisplayName>
+				<Severity>Error</Severity>
+			</EventId>
+			<EventId>
+				<Name Id="#x10">WrongWorkingCounterEtherCATCommandReceived</Name>
+				<DisplayName TxtId=""><![CDATA[Wrong working counter of {0} EtherCAT command received (Master: {1} )]]></DisplayName>
+				<Severity>Error</Severity>
+			</EventId>
+			<EventId>
+				<Name Id="#x1F">CompleteFrameMissing</Name>
+				<DisplayName TxtId=""><![CDATA[Complete frame missing! (Master: {0} )]]></DisplayName>
+				<Severity>Error</Severity>
+			</EventId>
+			<EventId>
+				<Name Id="#x20">EtherCATCommandNotSentNOPRequested</Name>
+				<DisplayName TxtId=""><![CDATA[{0} EtherCAT command not sent (NOP requested). (Master: {1} )]]></DisplayName>
+				<Severity>Error</Severity>
+			</EventId>
+			<EventId>
+				<Name Id="#x2F">CompleteFrameNotSent</Name>
+				<DisplayName TxtId=""><![CDATA[Complete frame not sent. (Master: {0} )]]></DisplayName>
+				<Severity>Error</Severity>
+			</EventId>
+			<EventId>
+				<Name Id="#x100">MismatchSlaveCountCfgSlaveCount</Name>
+				<DisplayName TxtId=""><![CDATA[Mismatch brtween SlaveCount and CfgSlaveCount (Master: {0} )]]></DisplayName>
+				<Severity>Error</Severity>
+			</EventId>
+			<Hides>
+				<Hide GUID="{83B32E6F-80BB-4A6D-B766-D9B3A019FA00}"/>
+				<Hide GUID="{4DB8E233-EF0E-458B-B5CB-C8119B56D9E3}"/>
+				<Hide GUID="{05C25344-9DFE-4E1A-9D7E-33DD70041527}"/>
+				<Hide GUID="{E2CF83D4-1590-4975-B479-8C267E991D45}"/>
+				<Hide GUID="{0958BF37-43ED-493E-A4DD-190C926A84CF}"/>
+				<Hide GUID="{688C85B1-082D-4DC5-BC13-F8C64F39A582}"/>
+				<Hide GUID="{254DFAB1-CF26-4388-8C8C-63ACF3778534}"/>
+				<Hide GUID="{4A99394C-E62B-47E4-8B1E-92321F7F798E}"/>
+				<Hide GUID="{E2F96B0F-3054-4967-99AA-BE6EE0CE5254}"/>
+				<Hide GUID="{07A2F6B5-2C98-4231-BF21-D1F387B62002}"/>
+				<Hide GUID="{23553014-9FF0-423A-B33D-2FACCC30F354}"/>
+			</Hides>
+		</DataType>
 	</DataTypes>
 	<Project ProjectGUID="{03A032F9-B6D2-8CC4-9E6B-69F13C79B4D2}" Target64Bit="true" ShowHideConfigurations="#x6">
 		<Plc>
 			<Project File="Wago7871664000080.xti"/>
+			<Project File="DiagnosisEtherCAT.xti"/>
 		</Plc>
 	</Project>
 </TcSmProject>

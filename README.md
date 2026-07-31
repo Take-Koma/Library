@@ -3,13 +3,20 @@
     自作のライブラリです。  
     BeckhoffのTwinCAT3で多分使えます。Beckhoffのライブラリ使用しています。  
 
-## Wago7871664000080
+## Tk_Wago_787-1664_000-080
 ### 説明
-    Wago製サーキットプロテクタ787-1664/000-080をBeckhoff製IO-LinkマスターEL6224に接続して作成したFBのライブラリです。  
+    Wago製サーキットプロテクタ787-1664/000-080を、　　
+　　Beckhoff製IO-LinkマスターEL6224に接続して作成したFBのライブラリです。  
 ### 使用Beckhoffライブラリ
     Tc2_Standard  
     Tc3_EventLogger  
     Tc3_IoLink
+
+## Tk_Diagnosis_EtherCAT
+### 説明
+    EtherCATのマスター、スレーブの診断用FBのライブラリです。  
+### 使用Beckhoffライブラリ
+    Tc3_EventLogger  
 
 ## メモ
     libraryとは関係が薄いですが、個人用のメモ

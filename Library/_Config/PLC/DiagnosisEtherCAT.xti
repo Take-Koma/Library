@@ -1,0 +1,6 @@
+<?xml version="1.0"?>
+<TcSmItem xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://www.beckhoff.com/schemas/2012/07/TcSmProject" TcSmVersion="1.0" TcVersion="3.1.4026.25" ClassName="CNestedPlcProjDef">
+	<Project GUID="{BC4ECB86-B776-4B0A-BDC9-B779FE95F5C9}" Name="DiagnosisEtherCAT" PrjFilePath="..\..\DiagnosisEtherCAT\DiagnosisEtherCAT.plcproj" TmcFilePath="..\..\DiagnosisEtherCAT\DiagnosisEtherCAT.tmc" ReloadTmc="true" AmsPort="852" FileArchiveSettings="#x000e" SymbolicMapping="true">
+		<Instance File="DiagnosisEtherCAT Instance.xti"/>
+	</Project>
+</TcSmItem>
