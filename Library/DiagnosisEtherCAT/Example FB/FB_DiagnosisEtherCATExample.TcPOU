@@ -28,7 +28,7 @@ VAR
 END_VAR
 ]]></Declaration>
     <Implementation>
-      <ST><![CDATA[]]></ST>
+      <ST><![CDATA[bError:=EtherCATMasterDiagnosis() OR EtherCATSlaveDiagnosis();]]></ST>
     </Implementation>
     <Method Name="EtherCATMasterDiagnosis" Id="{056ba304-6a92-4d09-a3ab-062fa6e9fe06}">
       <Declaration><![CDATA[METHOD PRIVATE EtherCATMasterDiagnosis : BOOL
@@ -51,7 +51,7 @@ END_VAR
       </Implementation>
     </Method>
     <LineIds Name="FB_DiagnosisEtherCATExample">
-      <LineId Id="1" Count="0" />
+      <LineId Id="2" Count="0" />
     </LineIds>
     <LineIds Name="FB_DiagnosisEtherCATExample.EtherCATMasterDiagnosis">
       <LineId Id="1" Count="3" />
