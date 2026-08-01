@@ -20,7 +20,7 @@
     <Released>false</Released>
     <Title>Tk_Diagnosis_EtherCAT</Title>
     <Author>TK</Author>
-    <ProjectVersion>0.0.7.0</ProjectVersion>
+    <ProjectVersion>0.0.8.0</ProjectVersion>
     <LibraryCategories>
       <LibraryCategory xmlns="">
         <Id>{a30025f5-4ecd-4f26-adb5-172022701ca1}</Id>
@@ -41,12 +41,15 @@
     </SelectedLibraryCategories>
     <Description>EtherCATのマスター、スレーブの診断用FBのライブラリです。</Description>
     <GlobalVersionStructureIncluded>true</GlobalVersionStructureIncluded>
+    <DocFormat>
+    </DocFormat>
   </PropertyGroup>
   <ItemGroup>
     <Folder Include="EtherCAT Master" />
     <Folder Include="EtherCAT Master\Base" />
     <Folder Include="EtherCAT Slave" />
     <Folder Include="EtherCAT Slave\Base" />
+    <Folder Include="Example FB" />
     <Folder Include="Version" />
   </ItemGroup>
   <ItemGroup>
@@ -100,6 +103,9 @@
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="EtherCAT Slave\I_DiagnosisEtherCATSlave.TcIO">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Example FB\FB_DiagnosisEtherCATExample.TcPOU">
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="Version\Global_Version.TcGVL">

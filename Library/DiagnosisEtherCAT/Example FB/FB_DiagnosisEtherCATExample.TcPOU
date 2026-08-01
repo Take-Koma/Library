@@ -1,0 +1,63 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1">
+  <POU Name="FB_DiagnosisEtherCATExample" Id="{d24a7a0c-9554-4788-877e-85f7aa52c758}" SpecialFunc="None">
+    <Declaration><![CDATA[FUNCTION_BLOCK FB_DiagnosisEtherCATExample
+VAR_OUTPUT
+	bError									:BOOL;																		//エラーを纏めて出力
+END_VAR
+VAR
+	i										:DINT;																		//for loop用
+	
+	//デバイス3
+	fbFrmWcStateDiagnosis3					:ARRAY[0..0] OF FB_FrmWcStateDiagnosis;										//EtherCAt Master3フレーム数のFB
+	fbFrmStateDiagnosis3					:ARRAY[0..0] OF FB_FrmStateDiagnosis;										//EtherCAt Master3フレーム数のFB
+	fbDiagnosisEtherCATMaster3				:FB_DiagnosisEtherCATMaster	:=(sMasterName:='Device3_EtherCAT');			//EtherCAt Master3診断用FB
+
+	//EtherCATスレーブ
+	fbTerm2									:FB_DiagnosisEtherCATSlaveWc1	:=(sSlaveName:='Term2_EL6224');				//EtherCAT Slave3診断用FB
+	fbTerm3									:FB_DiagnosisEtherCATSlaveWc0	:=(sSlaveName:='Term3_EK1110');				//EtherCAT Slave3診断用FB
+	fbTerm4									:FB_DiagnosisEtherCATSlaveWc1	:=(sSlaveName:='Term4_EK1828');				//EtherCAT Slave4診断用FB
+	fbTerm5									:FB_DiagnosisEtherCATSlaveWc1	:=(sSlaveName:='Term5_EL3318');				//EtherCAT Slave5診断用FB
+	
+	
+	aSlaveDiagnoses							:ARRAY[1..4] OF I_DiagnosisEtherCATSlave :=[fbTerm2,
+																						fbTerm3,
+																						fbTerm4,
+																						fbTerm5];						//EtherCAT Slave診断実行用のインターフェース
+	
+END_VAR
+]]></Declaration>
+    <Implementation>
+      <ST><![CDATA[]]></ST>
+    </Implementation>
+    <Method Name="EtherCATMasterDiagnosis" Id="{056ba304-6a92-4d09-a3ab-062fa6e9fe06}">
+      <Declaration><![CDATA[METHOD PRIVATE EtherCATMasterDiagnosis : BOOL
+]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[	fbDiagnosisEtherCATMaster3(	fbFrmWcStateDiagnosis:=fbFrmWcStateDiagnosis3,
+								fbFrmStateDiagnosis:=fbFrmStateDiagnosis3) ;
+								
+	EtherCATMasterDiagnosis:=fbDiagnosisEtherCATMaster3.bError;]]></ST>
+      </Implementation>
+    </Method>
+    <Method Name="EtherCATSlaveDiagnosis" Id="{6f58eec1-1263-404f-b437-ca5fae8bfe79}">
+      <Declaration><![CDATA[METHOD PRIVATE EtherCATSlaveDiagnosis : BOOL
+]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[	FOR i := LOWER_BOUND(aSlaveDiagnoses,1) TO UPPER_BOUND(aSlaveDiagnoses,1) DO
+		aSlaveDiagnoses[i].Execute();
+		EtherCATSlaveDiagnosis:=EtherCATSlaveDiagnosis OR aSlaveDiagnoses[i].bError;
+	END_FOR]]></ST>
+      </Implementation>
+    </Method>
+    <LineIds Name="FB_DiagnosisEtherCATExample">
+      <LineId Id="1" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_DiagnosisEtherCATExample.EtherCATMasterDiagnosis">
+      <LineId Id="1" Count="3" />
+    </LineIds>
+    <LineIds Name="FB_DiagnosisEtherCATExample.EtherCATSlaveDiagnosis">
+      <LineId Id="1" Count="3" />
+    </LineIds>
+  </POU>
+</TcPlcObject>
