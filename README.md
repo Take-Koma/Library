@@ -5,8 +5,8 @@
 
 ## Tk_Wago_787-1664_000-080
 ### 説明
-    Wago製サーキットプロテクタ787-1664/000-080を、　　
-　　Beckhoff製IO-LinkマスターEL6224に接続して作成したFBのライブラリです。  
+    Wago製サーキットプロテクタ787-1664/000-080を、  
+    Beckhoff製IO-LinkマスターEL6224に接続して作成したFBのライブラリです。  
 ### 使用Beckhoffライブラリ
     Tc2_Standard  
     Tc3_EventLogger  
