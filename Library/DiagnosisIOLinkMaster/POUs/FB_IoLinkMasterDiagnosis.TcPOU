@@ -93,9 +93,12 @@ END_VAR]]></Declaration>
 		
 			CASE (SHR(byStatus[i],4) AND 16#0F) OF
 				16#00:
-					fbErrorMessage[i].CreateEx(TC_EVENTS.TkIoLinkMasterPortDeviceStateEventClass.PortNoError);
-					fbErrorMessage[i].ipArguments.Clear().AddInt(i);
-					fbErrorMessage[i].Send();
+					IF (byStatus[i] AND 16#0F) <> 0 THEN
+						fbErrorMessage[i].CreateEx(TC_EVENTS.TkIoLinkMasterPortDeviceStateEventClass.PortNoError);
+						fbErrorMessage[i].ipArguments.Clear().AddInt(i);
+						fbErrorMessage[i].Send();	
+					END_IF
+					
 					
 				16#01:
 					fbErrorMessage[i].CreateEx(TC_EVENTS.TkIoLinkMasterPortDeviceStateEventClass.WatchdogDetected);
@@ -186,7 +189,12 @@ END_FOR]]></ST>
       </Implementation>
     </Method>
     <LineIds Name="FB_IoLinkMasterDiagnosis">
-      <LineId Id="1" Count="130" />
+      <LineId Id="132" Count="0" />
+      <LineId Id="2" Count="56" />
+      <LineId Id="133" Count="0" />
+      <LineId Id="136" Count="1" />
+      <LineId Id="134" Count="1" />
+      <LineId Id="61" Count="70" />
     </LineIds>
     <LineIds Name="FB_IoLinkMasterDiagnosis.FB_Init">
       <LineId Id="1" Count="2" />

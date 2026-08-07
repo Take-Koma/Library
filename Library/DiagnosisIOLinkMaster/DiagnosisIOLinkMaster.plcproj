@@ -37,7 +37,7 @@
       <Id xmlns="">{a30025f5-4ecd-4f26-adb5-172022701ca1}</Id>
     </SelectedLibraryCategories>
     <Author>TK</Author>
-    <ProjectVersion>0.0.1.0</ProjectVersion>
+    <ProjectVersion>0.0.2.0</ProjectVersion>
     <Title>Tk_Diagnosis_IO-LinkMaster</Title>
     <GlobalVersionStructureIncluded>true</GlobalVersionStructureIncluded>
     <Description>Beckhoff製IO-LinkマスターEL6224診断用FBのライブラリです。 </Description>
