@@ -1,0 +1,6 @@
+<?xml version="1.0"?>
+<TcSmItem xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://www.beckhoff.com/schemas/2012/07/TcSmProject" TcSmVersion="1.0" TcVersion="3.1.4026.25" ClassName="CNestedPlcProjDef">
+	<Project GUID="{DD353DAC-3676-49E6-9209-E5E086642012}" Name="DiagnosisIOLinkMaster" PrjFilePath="..\..\DiagnosisIOLinkMaster\DiagnosisIOLinkMaster.plcproj" TmcFilePath="..\..\DiagnosisIOLinkMaster\DiagnosisIOLinkMaster.tmc" ReloadTmc="true" AmsPort="853" FileArchiveSettings="#x000e" SymbolicMapping="true">
+		<Instance File="DiagnosisIOLinkMaster Instance.xti"/>
+	</Project>
+</TcSmItem>

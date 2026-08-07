@@ -138,6 +138,78 @@
 		<Text TxtId="Mismatch brtween SlaveCount and CfgSlaveCount (Master: {0} )">
 			<Text LcId="1041"><![CDATA[設定したスレーブ数と受信したスレーブ数が不一致 (Master: {0} )]]></Text>
 		</Text>
+		<Text TxtId="IO-Link Master Port,Device State EventClass">
+			<Text LcId="1041"><![CDATA[IO-Linkマスタポート、デバイス状態イベントクラス]]></Text>
+		</Text>
+		<Text TxtId="Port {0}  disabled">
+			<Text LcId="1041"><![CDATA[ポート {0}  無効]]></Text>
+		</Text>
+		<Text TxtId="Port {0}  in std dig in">
+			<Text LcId="1041"><![CDATA[ポート {0}  標準デジタル入力モード]]></Text>
+		</Text>
+		<Text TxtId="Port {0}  in std dig out">
+			<Text LcId="1041"><![CDATA[ポート {0}  標準デジタル出力モード]]></Text>
+		</Text>
+		<Text TxtId="Port {0}  in communication OP">
+			<Text LcId="1041"><![CDATA[ポート {0}  通信中 (OP)]]></Text>
+		</Text>
+		<Text TxtId="Port {0}  in communication COMSTOP">
+			<Text LcId="1041"><![CDATA[ポート {0}  通信停止 (COMSTOP)]]></Text>
+		</Text>
+		<Text TxtId="NotDefined 5">
+			<Text LcId="1041"><![CDATA[未定義 5]]></Text>
+		</Text>
+		<Text TxtId="NotDefined 6">
+			<Text LcId="1041"><![CDATA[未定義 6]]></Text>
+		</Text>
+		<Text TxtId="NotDefined 7">
+			<Text LcId="1041"><![CDATA[未定義 7]]></Text>
+		</Text>
+		<Text TxtId="Port {0}  Process Data Invalid Bit">
+			<Text LcId="1041"><![CDATA[ポート {0}  プロセスデータ無効ビット]]></Text>
+		</Text>
+		<Text TxtId="Port {0}  Watchdog detected">
+			<Text LcId="1041"><![CDATA[ポート {0}  ウォッチドッグ検出]]></Text>
+		</Text>
+		<Text TxtId="Port {0}  internal Error">
+			<Text LcId="1041"><![CDATA[ポート {0}  内部エラー]]></Text>
+		</Text>
+		<Text TxtId="Port {0}  invalid Device ID">
+			<Text LcId="1041"><![CDATA[ポート {0}  無効なデバイスID]]></Text>
+		</Text>
+		<Text TxtId="Port {0}  invalid Vendor ID">
+			<Text LcId="1041"><![CDATA[ポート {0}  無効なベンダーID]]></Text>
+		</Text>
+		<Text TxtId="Port {0}  invalid IO-Link Version">
+			<Text LcId="1041"><![CDATA[ポート {0}  無効なIO-Linkバージョン]]></Text>
+		</Text>
+		<Text TxtId="Port {0}  invalid Frame Capability">
+			<Text LcId="1041"><![CDATA[ポート {0}  無効なフレーム機能]]></Text>
+		</Text>
+		<Text TxtId="Port {0}  invalid Cycle Time">
+			<Text LcId="1041"><![CDATA[ポート {0}  無効なサイクルタイム]]></Text>
+		</Text>
+		<Text TxtId="Port {0}  invalid PD in length">
+			<Text LcId="1041"><![CDATA[ポート {0}  無効なPD入力長]]></Text>
+		</Text>
+		<Text TxtId="Port {0}  invalid PD out length">
+			<Text LcId="1041"><![CDATA[ポート {0}  無効なPD出力長]]></Text>
+		</Text>
+		<Text TxtId="Port {0}  no Device detected">
+			<Text LcId="1041"><![CDATA[ポート {0}  デバイス未検出]]></Text>
+		</Text>
+		<Text TxtId="Port {0}  error PreOP/Data storage">
+			<Text LcId="1041"><![CDATA[ポート {0}  PreOP/データストレージエラー]]></Text>
+		</Text>
+		<Text TxtId="Port {0}  is in state {1}">
+			<Text LcId="1041"><![CDATA[ポート {0}  ステート {1}]]></Text>
+		</Text>
+		<Text TxtId="Port {0}  has error {1}">
+			<Text LcId="1041"><![CDATA[ポート {0}  エラー {1}]]></Text>
+		</Text>
+		<Text TxtId="Port {0}  No error">
+			<Text LcId="1041"><![CDATA[ポート {0}  エラー無し]]></Text>
+		</Text>
 	</Translations>
 	<DataTypes>
 		<DataType>
@@ -406,11 +478,149 @@
 				<Hide GUID="{23553014-9FF0-423A-B33D-2FACCC30F354}"/>
 			</Hides>
 		</DataType>
+		<DataType>
+			<Name GUID="{642D1E59-8285-47A9-8E0C-E883AEB52A2B}" PersistentType="true">TkIoLinkMasterPortDeviceStateEventClass</Name>
+			<DisplayName TxtId=""><![CDATA[IO-Link Master Port,Device State EventClass]]></DisplayName>
+			<EventId>
+				<Name Id="#x00">PortDisabled</Name>
+				<DisplayName TxtId=""><![CDATA[Port {0}  disabled]]></DisplayName>
+				<Severity>Info</Severity>
+			</EventId>
+			<EventId>
+				<Name Id="#x01">PortInStdDigIn</Name>
+				<DisplayName TxtId=""><![CDATA[Port {0}  in std dig in]]></DisplayName>
+				<Severity>Info</Severity>
+			</EventId>
+			<EventId>
+				<Name Id="#x02">PortInStdDigOut</Name>
+				<DisplayName TxtId=""><![CDATA[Port {0}  in std dig out]]></DisplayName>
+				<Severity>Info</Severity>
+			</EventId>
+			<EventId>
+				<Name Id="#x03">PortInCommunicationOP</Name>
+				<DisplayName TxtId=""><![CDATA[Port {0}  in communication OP]]></DisplayName>
+				<Severity>Info</Severity>
+			</EventId>
+			<EventId>
+				<Name Id="#x04">PortInCommunicationCOMSTOP</Name>
+				<DisplayName TxtId=""><![CDATA[Port {0}  in communication COMSTOP]]></DisplayName>
+				<Severity>Warning</Severity>
+			</EventId>
+			<EventId>
+				<Name Id="#x05">NotDefined5</Name>
+				<DisplayName TxtId=""><![CDATA[NotDefined 5]]></DisplayName>
+				<Severity>Verbose</Severity>
+			</EventId>
+			<EventId>
+				<Name Id="#x06">NotDefined6</Name>
+				<DisplayName TxtId=""><![CDATA[NotDefined 6]]></DisplayName>
+				<Severity>Verbose</Severity>
+			</EventId>
+			<EventId>
+				<Name Id="#x07">NotDefined7</Name>
+				<DisplayName TxtId=""><![CDATA[NotDefined 7]]></DisplayName>
+				<Severity>Verbose</Severity>
+			</EventId>
+			<EventId>
+				<Name Id="#x08">ProcessDataInvalidBit</Name>
+				<DisplayName TxtId=""><![CDATA[Port {0}  Process Data Invalid Bit]]></DisplayName>
+				<Severity>Warning</Severity>
+			</EventId>
+			<EventId>
+				<Name Id="#x10">WatchdogDetected</Name>
+				<DisplayName TxtId=""><![CDATA[Port {0}  Watchdog detected]]></DisplayName>
+				<Severity>Error</Severity>
+			</EventId>
+			<EventId>
+				<Name Id="#x20">InternalError</Name>
+				<DisplayName TxtId=""><![CDATA[Port {0}  internal Error]]></DisplayName>
+				<Severity>Error</Severity>
+			</EventId>
+			<EventId>
+				<Name Id="#x30">InvalidDeviceID</Name>
+				<DisplayName TxtId=""><![CDATA[Port {0}  invalid Device ID]]></DisplayName>
+				<Severity>Error</Severity>
+			</EventId>
+			<EventId>
+				<Name Id="#x40">InvalidVendorID</Name>
+				<DisplayName TxtId=""><![CDATA[Port {0}  invalid Vendor ID]]></DisplayName>
+				<Severity>Error</Severity>
+			</EventId>
+			<EventId>
+				<Name Id="#x50">InvalidIOLinkVersion</Name>
+				<DisplayName TxtId=""><![CDATA[Port {0}  invalid IO-Link Version]]></DisplayName>
+				<Severity>Error</Severity>
+			</EventId>
+			<EventId>
+				<Name Id="#x60">InvalidFrameCapability</Name>
+				<DisplayName TxtId=""><![CDATA[Port {0}  invalid Frame Capability]]></DisplayName>
+				<Severity>Error</Severity>
+			</EventId>
+			<EventId>
+				<Name Id="#x70">InvalidCycleTime</Name>
+				<DisplayName TxtId=""><![CDATA[Port {0}  invalid Cycle Time]]></DisplayName>
+				<Severity>Error</Severity>
+			</EventId>
+			<EventId>
+				<Name Id="#x80">InvalidPDInlength</Name>
+				<DisplayName TxtId=""><![CDATA[Port {0}  invalid PD in length]]></DisplayName>
+				<Severity>Error</Severity>
+			</EventId>
+			<EventId>
+				<Name Id="#x90">InvalidPDOutlength</Name>
+				<DisplayName TxtId=""><![CDATA[Port {0}  invalid PD out length]]></DisplayName>
+				<Severity>Error</Severity>
+			</EventId>
+			<EventId>
+				<Name Id="#xA0">NoDeviceDetected</Name>
+				<DisplayName TxtId=""><![CDATA[Port {0}  no Device detected]]></DisplayName>
+				<Severity>Error</Severity>
+			</EventId>
+			<EventId>
+				<Name Id="#xB0">ErrorPreOPDataStorage</Name>
+				<DisplayName TxtId=""><![CDATA[Port {0}  error PreOP/Data storage]]></DisplayName>
+				<Severity>Error</Severity>
+			</EventId>
+			<EventId>
+				<Name Id="#x09">PortState</Name>
+				<DisplayName TxtId=""><![CDATA[Port {0}  is in state {1}]]></DisplayName>
+				<Severity>Warning</Severity>
+			</EventId>
+			<EventId>
+				<Name Id="#xC0">PortError</Name>
+				<DisplayName TxtId=""><![CDATA[Port {0}  has error {1}]]></DisplayName>
+				<Severity>Error</Severity>
+			</EventId>
+			<EventId>
+				<Name Id="#xF0">PortNoError</Name>
+				<DisplayName TxtId=""><![CDATA[Port {0}  No error]]></DisplayName>
+				<Severity>Info</Severity>
+			</EventId>
+			<Hides>
+				<Hide GUID="{D97E1BF2-A972-49E9-AE9A-73FE3A1BA9DD}"/>
+				<Hide GUID="{D1AF8042-EA06-49B1-9945-E473E0645975}"/>
+				<Hide GUID="{0A166D66-E86B-4A30-B9FD-9C66C494EBD6}"/>
+				<Hide GUID="{F976B9AE-95E0-406F-AF3E-62E7D9E388ED}"/>
+				<Hide GUID="{40E865B6-EA8D-4B21-AF68-348FB9A3E3B4}"/>
+				<Hide GUID="{37172636-A48D-40EE-BC23-68CCF7EA9403}"/>
+				<Hide GUID="{B9802EB2-6FB2-47D1-9727-85BDA8EC3D99}"/>
+				<Hide GUID="{764E7010-F51D-4BBB-A18D-2188640DC106}"/>
+				<Hide GUID="{DEFC363C-CCFF-4D23-8667-D09EB9E3DC46}"/>
+				<Hide GUID="{AD6E5257-235A-4CF2-82E1-50554F9974D2}"/>
+				<Hide GUID="{49851AB2-85FB-4303-857F-D908F96F03BF}"/>
+				<Hide GUID="{E6C7EC17-4C36-4998-B510-656551E9F6B9}"/>
+				<Hide GUID="{2FB24628-BEB6-443A-9A86-FD846C8FFDEC}"/>
+				<Hide GUID="{A35CDE81-4817-4D2A-8DE5-375225953B83}"/>
+				<Hide GUID="{FBB9F208-9340-45AB-9F44-13C417C4FFB3}"/>
+				<Hide GUID="{22995F2F-139A-431D-A43E-1A30F0213FEA}"/>
+			</Hides>
+		</DataType>
 	</DataTypes>
 	<Project ProjectGUID="{03A032F9-B6D2-8CC4-9E6B-69F13C79B4D2}" Target64Bit="true" ShowHideConfigurations="#x6">
 		<Plc>
 			<Project File="Wago7871664000080.xti"/>
 			<Project File="DiagnosisEtherCAT.xti"/>
+			<Project File="DiagnosisIOLinkMaster.xti"/>
 		</Plc>
 	</Project>
 </TcSmProject>

@@ -1,0 +1,195 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1">
+  <POU Name="FB_IoLinkMasterDiagnosis" Id="{9204d9a4-c6ad-46d7-bc45-5d241d05aa19}" SpecialFunc="None">
+    <Declaration><![CDATA[(*
+BeckhoffのIO-LinkマスターでEL6224使用するFBです。
+初期化の際に使用するIO-LinkポートをTRUEにしてください。
+
+DiagHistoryに新しい診断メッセージ発生時にはbInfoがTRUEになります。
+少なくとも1台のデバイスにエラーが発生した場合にはbErrorがTRUEになります。
+*)
+
+FUNCTION_BLOCK FB_IoLinkMasterDiagnosis
+VAR_OUTPUT
+	bError						:BOOL;								//エラー発生を出力(少なくとも1台のデバイスにエラー)
+	bInfo						:BOOL;								//診断メッセージ有りを出力(DiagHistoryに新しい診断メッセージ)
+END_VAR
+VAR
+	//For loop
+	i							:INT;
+
+	//実I/Oにリンク
+	byStatus			AT %I*	:ARRAY[1..4] OF BYTE;				//State Ch.*にリンク
+	bDeviceDiag			AT %I*	:BOOL;								//DiagHistoryに新しい診断メッセージ
+	bDeviceState		AT %I*	:BOOL;								//少なくとも1台のデバイスにエラー
+	
+	//初期化の際に使用するポートを入力
+	_bEnabledPort				:ARRAY[1..4] OF BOOL;
+
+	//各チャンネルのメッセージ
+	byPrevState					:ARRAY[1..4] OF BYTE	:=[16#FF,16#FF,16#FF,16#FF];
+	fbStateMessage				:ARRAY[1..4] OF FB_TcMessage;
+	
+	byPrevError					:ARRAY[1..4] OF BYTE	:=[16#FF,16#FF,16#FF,16#FF];
+	fbErrorMessage				:ARRAY[1..4] OF FB_TcMessage;
+	
+END_VAR]]></Declaration>
+    <Implementation>
+      <ST><![CDATA[//エラー状態、診断メッセージ状態を出力
+	bError	:=bDeviceState;
+	bInfo	:=bDeviceDiag;
+
+//
+	FOR i := 1 TO 4 BY 1 DO
+	 	
+		//下位4bitはポートステータス
+		IF _bEnabledPort[i] AND byPrevState[i]<>(byStatus[i] AND 16#0F) THEN
+		
+			CASE (byStatus[i] AND 16#0F) OF
+				16#00:
+					fbStateMessage[i].CreateEx(TC_EVENTS.TkIoLinkMasterPortDeviceStateEventClass.PortDisabled);
+					fbStateMessage[i].ipArguments.Clear().AddInt(i);
+					fbStateMessage[i].Send();
+					
+				16#01:
+					fbStateMessage[i].CreateEx(TC_EVENTS.TkIoLinkMasterPortDeviceStateEventClass.PortInStdDigIn);
+					fbStateMessage[i].ipArguments.Clear().AddInt(i);
+					fbStateMessage[i].Send();				
+				
+				16#02:
+					fbStateMessage[i].CreateEx(TC_EVENTS.TkIoLinkMasterPortDeviceStateEventClass.PortInStdDigOut);
+					fbStateMessage[i].ipArguments.Clear().AddInt(i);
+					fbStateMessage[i].Send();
+				
+				16#03:
+					fbStateMessage[i].CreateEx(TC_EVENTS.TkIoLinkMasterPortDeviceStateEventClass.PortInCommunicationOP);
+					fbStateMessage[i].ipArguments.Clear().AddInt(i);
+					fbStateMessage[i].Send();
+				
+				16#04:
+					fbStateMessage[i].CreateEx(TC_EVENTS.TkIoLinkMasterPortDeviceStateEventClass.PortInCommunicationCOMSTOP);
+					fbStateMessage[i].ipArguments.Clear().AddInt(i);
+					fbStateMessage[i].Send();
+				
+				16#08:
+					fbStateMessage[i].CreateEx(TC_EVENTS.TkIoLinkMasterPortDeviceStateEventClass.ProcessDataInvalidBit);
+					fbStateMessage[i].ipArguments.Clear().AddInt(i);
+					fbStateMessage[i].Send();
+				
+				ELSE
+					fbStateMessage[i].CreateEx(TC_EVENTS.TkIoLinkMasterPortDeviceStateEventClass.PortState);
+					fbStateMessage[i].ipArguments.Clear().AddInt(i).AddInt(byStatus[i] AND 16#0F);
+					fbStateMessage[i].Send();
+				
+			END_CASE
+		
+			 byPrevState[i]:=(byStatus[i] AND 16#0F);
+		
+		END_IF
+	
+		
+		//上位4bitはポートエラー
+		IF _bEnabledPort[i] AND byPrevError[i]<>(SHR(byStatus[i],4) AND 16#0F) THEN
+		
+			CASE (SHR(byStatus[i],4) AND 16#0F) OF
+				16#00:
+					fbErrorMessage[i].CreateEx(TC_EVENTS.TkIoLinkMasterPortDeviceStateEventClass.PortNoError);
+					fbErrorMessage[i].ipArguments.Clear().AddInt(i);
+					fbErrorMessage[i].Send();
+					
+				16#01:
+					fbErrorMessage[i].CreateEx(TC_EVENTS.TkIoLinkMasterPortDeviceStateEventClass.WatchdogDetected);
+					fbErrorMessage[i].ipArguments.Clear().AddInt(i);
+					fbErrorMessage[i].Send();
+				
+				16#02:
+					fbErrorMessage[i].CreateEx(TC_EVENTS.TkIoLinkMasterPortDeviceStateEventClass.InternalError);
+					fbErrorMessage[i].ipArguments.Clear().AddInt(i);
+					fbErrorMessage[i].Send();
+				
+				16#03:
+					fbErrorMessage[i].CreateEx(TC_EVENTS.TkIoLinkMasterPortDeviceStateEventClass.InvalidDeviceID);
+					fbErrorMessage[i].ipArguments.Clear().AddInt(i);
+					fbErrorMessage[i].Send();
+				
+				16#04:
+					fbErrorMessage[i].CreateEx(TC_EVENTS.TkIoLinkMasterPortDeviceStateEventClass.InvalidVendorID);
+					fbErrorMessage[i].ipArguments.Clear().AddInt(i);
+					fbErrorMessage[i].Send();
+				
+				16#05:
+					fbErrorMessage[i].CreateEx(TC_EVENTS.TkIoLinkMasterPortDeviceStateEventClass.InvalidIOLinkVersion);
+					fbErrorMessage[i].ipArguments.Clear().AddInt(i);
+					fbErrorMessage[i].Send();
+				
+				16#06:
+					fbErrorMessage[i].CreateEx(TC_EVENTS.TkIoLinkMasterPortDeviceStateEventClass.InvalidFrameCapability);
+					fbErrorMessage[i].ipArguments.Clear().AddInt(i);
+					fbErrorMessage[i].Send();
+				
+				16#07:
+					fbErrorMessage[i].CreateEx(TC_EVENTS.TkIoLinkMasterPortDeviceStateEventClass.InvalidCycleTime);
+					fbErrorMessage[i].ipArguments.Clear().AddInt(i);
+					fbErrorMessage[i].Send();
+				
+				16#08:
+					fbErrorMessage[i].CreateEx(TC_EVENTS.TkIoLinkMasterPortDeviceStateEventClass.InvalidPDInlength);
+					fbErrorMessage[i].ipArguments.Clear().AddInt(i);
+					fbErrorMessage[i].Send();
+				
+				16#09:
+					fbErrorMessage[i].CreateEx(TC_EVENTS.TkIoLinkMasterPortDeviceStateEventClass.InvalidPDOutlength);
+					fbErrorMessage[i].ipArguments.Clear().AddInt(i);
+					fbErrorMessage[i].Send();
+				
+				16#0A:
+					fbErrorMessage[i].CreateEx(TC_EVENTS.TkIoLinkMasterPortDeviceStateEventClass.NoDeviceDetected);
+					fbErrorMessage[i].ipArguments.Clear().AddInt(i);
+					fbErrorMessage[i].Send();
+				
+				16#0B:
+					fbErrorMessage[i].CreateEx(TC_EVENTS.TkIoLinkMasterPortDeviceStateEventClass.ErrorPreOPDataStorage);
+					fbErrorMessage[i].ipArguments.Clear().AddInt(i);
+					fbErrorMessage[i].Send();
+				
+				ELSE
+					fbErrorMessage[i].CreateEx(TC_EVENTS.TkIoLinkMasterPortDeviceStateEventClass.PortError);
+					fbErrorMessage[i].ipArguments.Clear().AddInt(i).AddInt(SHR(byStatus[i],4) AND 16#0F);
+					fbErrorMessage[i].Send();
+				
+			END_CASE
+		
+			byPrevError[i]:=(SHR(byStatus[i],4) AND 16#0F);
+			
+		END_IF
+	
+	
+	END_FOR
+]]></ST>
+    </Implementation>
+    <Method Name="FB_Init" Id="{60bdc26f-5bb8-4011-98c1-daa3ab6b92cc}">
+      <Declaration><![CDATA[//FB_Init は常に暗黙的に使用可能で、主に初期化に使用されます。
+//戻り値は評価されません。特定の結果を得るために、メソッドを明示的に宣言し、
+//そのメソッドに標準の初期化コードをもったコードを追加することができます。戻り値を評価できます。
+METHOD FB_Init: BOOL
+VAR_INPUT
+    bInitRetains	:BOOL; // TRUE: 保持変数は初期化されます (ウォーム リセット、あるいはコールド リセット)
+    bInCopyCode		:BOOL;  // TRUE: 後でコードをコピーする (オンライン変更) ために、インスタンスをコピーします。
+	
+	bEnabledPort	:ARRAY[1..4] OF BOOL;
+END_VAR
+]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[FOR i:=1 TO 4 DO
+	_bEnabledPort[i]:=bEnabledPort[i];
+END_FOR]]></ST>
+      </Implementation>
+    </Method>
+    <LineIds Name="FB_IoLinkMasterDiagnosis">
+      <LineId Id="1" Count="130" />
+    </LineIds>
+    <LineIds Name="FB_IoLinkMasterDiagnosis.FB_Init">
+      <LineId Id="1" Count="2" />
+    </LineIds>
+  </POU>
+</TcPlcObject>

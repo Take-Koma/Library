@@ -18,6 +18,12 @@
 ### 使用Beckhoffライブラリ
     Tc3_EventLogger  
 
+## Tk_Diagnosis_IO-LinkMaster
+### 説明
+    Beckhoff製IO-LinkマスターEL6224診断用FBのライブラリです。  
+### 使用Beckhoffライブラリ
+    Tc3_EventLogger  
+
 ## メモ
     libraryとは関係が薄いですが、個人用のメモ
     
