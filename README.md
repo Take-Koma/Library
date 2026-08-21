@@ -8,7 +8,6 @@
     Wago製サーキットプロテクタ787-1664/000-080を、  
     Beckhoff製IO-LinkマスターEL6224に接続して作成したFBのライブラリです。  
 ### 使用Beckhoffライブラリ
-    Tc2_Standard  
     Tc3_EventLogger  
     Tc3_IoLink
 
@@ -23,6 +22,14 @@
     Beckhoff製IO-LinkマスターEL6224診断用FBのライブラリです。  
 ### 使用Beckhoffライブラリ
     Tc3_EventLogger  
+
+## Tk_MachineControl
+### 説明
+    マシンの管理用ライブラリ  
+    アラーム、4024用イベントリード、マシンステート 
+### 使用Beckhoffライブラリ
+    Tc2_Utillities
+    Tc3_EventLogger 
 
 ## メモ
     libraryとは関係が薄いですが、個人用のメモ

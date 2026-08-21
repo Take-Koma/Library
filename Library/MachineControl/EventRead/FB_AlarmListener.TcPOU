@@ -1,0 +1,201 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1">
+  <POU Name="FB_AlarmListener" Id="{c9d0ed7a-eca4-4cf8-b2f3-c7311026fcca}" SpecialFunc="None">
+    <Declaration><![CDATA[FUNCTION_BLOCK FB_AlarmListener EXTENDS FB_ListenerBase2
+VAR_OUTPUT
+	aEvents        				:ARRAY[1..GVL.uiAlarmMaxCount] OF ST_EventRead;
+END_VAR
+VAR
+	tzinfo 						:ST_TimeZoneInformation;
+	tTimeBuf					:STRING;
+	fbGetTimeZoneInformation	:FB_GetTimeZoneInformation;
+	bTimeZoneConfigured			:BOOL;
+	
+	fbListenerFilter			:FB_TcEventFilter; 
+	GUID						:GUID;
+	
+	udiGetString				:UDINT:=1;
+	udiErrEvents				:UDINT;
+	
+	fbRequestEventText			:FB_RequestEventText;
+	hr							:HRESULT;
+	fbREdge						:R_TRIG;
+END_VAR]]></Declaration>
+    <Implementation>
+      <ST><![CDATA[//IPCのタイムゾーン取得
+IF bTimeZoneConfigured=FALSE THEN
+    fbGetTimeZoneInformation(bExecute := TRUE, tzInfo => tzinfo);
+    IF fbGetTimeZoneInformation.bBusy=FALSE AND fbGetTimeZoneInformation.bError=FALSE THEN
+        fbGetTimeZoneInformation(bExecute := FALSE);
+        bTimeZoneConfigured := TRUE; // 完了フラグ
+    END_IF
+END_IF
+
+//常に呼び出す必要があるので呼び出し
+THIS^.Execute();
+]]></ST>
+    </Implementation>
+    <Method Name="Execute" Id="{f9c7225e-57e2-41a1-9202-b7292c4325be}">
+      <Declaration><![CDATA[METHOD Execute : HRESULT
+VAR
+	bGettedText:BOOL;
+END_VAR
+]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[SUPER^.Execute();
+
+IF aEvents[udiGetString].MessageText='' AND aEvents[udiGetString].nEventId<>0 THEN 
+	
+	fbREdge(CLK:=TRUE);
+
+	IF fbREdge.Q THEN
+		hr:=fbRequestEventText.Request(	eventClass		:=GUID,
+										nEventId		:=aEvents[udiGetString].nEventId,
+										nLangId			:=1041,
+										ipArgs			:=0
+										);		
+	END_IF
+
+	IF SUCCEEDED(hr) THEN
+		IF fbRequestEventText.bBusy=FALSE AND fbRequestEventText.bError=FALSE THEN
+			bGettedText:=fbRequestEventText.GetString(sResult:=aEvents[udiGetString].MessageText,nresult:=SIZEOF(aEvents[udiGetString].MessageText));
+		END_IF
+		
+	END_IF
+
+ELSE
+	fbREdge(CLK:=FALSE);
+	hr:=0;
+	
+	IF udiGetString < udiErrEvents THEN
+		udiGetString := udiGetString + 1;
+	ELSIF udiErrEvents < udiGetString -1 THEN
+		udiGetString := udiGetString - 1;
+	END_IF
+	
+END_IF
+]]></ST>
+      </Implementation>
+    </Method>
+    <Method Name="FB_init" Id="{99088e2a-9332-46cd-9923-b3886ba1289a}">
+      <Declaration><![CDATA[METHOD FB_init : BOOL
+VAR_INPUT
+	bInitRetains	:BOOL;		// if TRUE, the retain variables are initialized (warm start / cold start)
+	bInCopyCode		:BOOL; 		// if TRUE, the instance afterwards gets moved into the copy code (online change)
+	
+	AlarmGUID		:GUID;		//アラームのユーザーイベントのGUID
+END_VAR
+]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[//GUIDの取得
+GUID:=AlarmGUID;
+
+IF bInCopyCode = FALSE THEN
+	
+	//継承元のファンクションブロックの読み込むイベントのフィルター設定
+	fbListenerFilter.Clear().EventClass.EqualTo(GUID);
+	
+	//設定したフィルターを設定する
+	THIS^.Subscribe2(fbListenerFilter);
+
+END_IF]]></ST>
+      </Implementation>
+    </Method>
+    <Method Name="OnAlarmCleared" Id="{25f624db-b730-4666-886d-015972f12bf8}">
+      <Declaration><![CDATA[METHOD OnAlarmCleared : HRESULT
+VAR_INPUT
+	fbEvent : REFERENCE TO FB_TcEvent;
+END_VAR
+VAR
+	udi1	:UDINT;
+	udi2	:UDINT;
+END_VAR]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[//アレイの中のイベント検索
+FOR udi1 := 1 TO udiErrEvents DO
+	IF THIS^.aEvents[udi1].nEventId=fbEvent.nEventId THEN
+		EXIT;
+	END_IF
+END_FOR
+
+//該当イベント削除
+THIS^.aEvents[udi1].Severity	:="";
+THIS^.aEvents[udi1].nEventId	:=0;
+THIS^.aEvents[udi1].nSourceId	:=0;
+THIS^.aEvents[udi1].sDate		:='';
+THIS^.aEvents[udi1].sTime		:='';
+THIS^.aEvents[udi1].MessageText	:='';
+
+//以降のイベントをずらす
+FOR udi2 := udi1 TO udiErrEvents-1 DO
+	THIS^.aEvents[udi2].Severity	:=THIS^.aEvents[udi2+1].Severity;
+	THIS^.aEvents[udi2].nEventId	:=THIS^.aEvents[udi2+1].nEventId;
+	THIS^.aEvents[udi2].nSourceId	:=THIS^.aEvents[udi2+1].nSourceId;
+	THIS^.aEvents[udi2].sDate		:=THIS^.aEvents[udi2+1].sDate;
+	THIS^.aEvents[udi2].sTime		:=THIS^.aEvents[udi2+1].sTime;
+	THIS^.aEvents[udi2].MessageText	:=THIS^.aEvents[udi2+1].MessageText;
+END_FOR
+
+//最後のイベント削除
+THIS^.aEvents[udiErrEvents].Severity	:="";
+THIS^.aEvents[udiErrEvents].nEventId	:=0;
+THIS^.aEvents[udiErrEvents].nSourceId	:=0;
+THIS^.aEvents[udiErrEvents].sDate		:='';
+THIS^.aEvents[udiErrEvents].sTime		:='';
+THIS^.aEvents[udiErrEvents].MessageText	:='';
+
+udiErrEvents:=udiErrEvents-1;
+
+OnAlarmCleared:=S_OK;]]></ST>
+      </Implementation>
+    </Method>
+    <Method Name="OnAlarmRaised" Id="{0a03ba74-7dc7-4782-a2e0-a8e9f39756b4}">
+      <Declaration><![CDATA[METHOD OnAlarmRaised : HRESULT
+VAR_INPUT
+	fbEvent : REFERENCE TO FB_TcEvent;
+END_VAR]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[udiErrEvents:=udiErrEvents+1;
+
+CASE fbEvent.eSeverity OF 
+	TcEventSeverity.Critical:
+		THIS^.aEvents[udiErrEvents].Severity:= "クリティカル";
+		
+	TcEventSeverity.Error:
+		THIS^.aEvents[udiErrEvents].Severity:= "エラー";
+		
+	TcEventSeverity.Warning:
+		THIS^.aEvents[udiErrEvents].Severity:= "ワーニング";
+END_CASE
+
+THIS^.aEvents[udiErrEvents].nEventId:=fbEvent.nEventId;
+THIS^.aEvents[udiErrEvents].nSourceId:=fbEvent.ipSourceInfo.nId;
+
+tTimeBuf:=FILETIME64_TO_ISO8601(fileTime 	:= fbEvent.nTimestamp,
+								nBias 		:= TO_INT(tzInfo.bias), 
+								bUTC 		:=TRUE, 
+								nPrecision	:= 0);
+
+THIS^.aEvents[udiErrEvents].sDate:=MID(tTimeBuf, 10, 1);
+THIS^.aEvents[udiErrEvents].sTime:=MID(tTimeBuf, 8, 12);
+
+OnAlarmRaised:=S_OK;]]></ST>
+      </Implementation>
+    </Method>
+    <LineIds Name="FB_AlarmListener">
+      <LineId Id="1" Count="11" />
+    </LineIds>
+    <LineIds Name="FB_AlarmListener.Execute">
+      <LineId Id="1" Count="32" />
+    </LineIds>
+    <LineIds Name="FB_AlarmListener.FB_init">
+      <LineId Id="1" Count="11" />
+    </LineIds>
+    <LineIds Name="FB_AlarmListener.OnAlarmCleared">
+      <LineId Id="1" Count="35" />
+    </LineIds>
+    <LineIds Name="FB_AlarmListener.OnAlarmRaised">
+      <LineId Id="1" Count="24" />
+    </LineIds>
+  </POU>
+</TcPlcObject>

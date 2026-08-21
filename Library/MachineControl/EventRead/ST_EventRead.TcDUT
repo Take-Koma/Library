@@ -1,0 +1,17 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1">
+  <DUT Name="ST_EventRead" Id="{9ec98294-8c08-4227-92ae-6977b015f0a4}">
+    <Declaration><![CDATA[TYPE ST_EventRead :
+STRUCT
+	nSourceId		:UDINT;
+    nEventId		:UDINT;
+    Severity		:WSTRING(17);
+	sDate			:STRING(23);
+    sTime			:STRING(23);
+	{attribute 'TcEncoding':='UTF-8'}
+	MessageText		:STRING(255);
+END_STRUCT
+END_TYPE
+]]></Declaration>
+  </DUT>
+</TcPlcObject>

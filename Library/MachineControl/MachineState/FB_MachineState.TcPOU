@@ -1,0 +1,132 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1">
+  <POU Name="FB_MachineState" Id="{c973bc40-a96e-4db3-9daa-2f59595f3f57}" SpecialFunc="None">
+    <Declaration><![CDATA[FUNCTION_BLOCK FB_MachineState EXTENDS FB_ListenerBase2
+VAR_INPUT
+	bCritical					:BOOL;				//クリティカルの発生
+	bError						:BOOL;				//エラーの発生
+	bWarning					:BOOL;				//ワーニングの発生
+	bStay						:BOOL;				//サーボOFF
+	bStop						:BOOL;				//サーボON
+	bMoving						:BOOL;				//自動動作実行中
+END_VAR
+VAR_OUTPUT
+	eMachineState				:E_MachineState;	//マシーンステートを出力
+	bStopMachine				:BOOL;				//動作停止指示
+END_VAR
+VAR
+	fbListenerFilter			:FB_TcEventFilter; 	//読みだすイベント設定フィルター
+
+    liCriticalActiveCount		:LINT	:= 0;		//クリティカル発生数
+    liErrorActiveCount			:LINT	:= 0;		//エラー発生数
+    liWarningActiveCount		:LINT	:= 0;		//ワーニング発生数
+
+END_VAR
+]]></Declaration>
+    <Implementation>
+      <ST><![CDATA[//---常に呼び出す必要があるので呼び出し---
+	SUPER^.Execute();
+
+//---発生アラームの重いほうからマシンステートに登録---
+	IF bCritical=TRUE OR 0<liCriticalActiveCount THEN
+		eMachineState:=E_MachineState.Critical;
+		bStopMachine:=TRUE;
+		
+	ELSIF bError=TRUE OR 0<liErrorActiveCount THEN
+		eMachineState:=E_MachineState.Error;
+		bStopMachine:=TRUE;
+	
+	ELSIF bWarning=TRUE OR 0<liWarningActiveCount THEN
+		eMachineState:=E_MachineState.Warning;
+		bStopMachine:=FALSE;
+		
+	ELSIF bStay=TRUE THEN
+		eMachineState:=E_MachineState.Stay;
+		bStopMachine:=FALSE;
+		
+	ELSIF bStop=TRUE THEN
+		eMachineState:=E_MachineState.Stop;
+		bStopMachine:=FALSE;
+		
+	ELSIF bMoving=TRUE THEN
+		eMachineState:=E_MachineState.Moving;
+		bStopMachine:=FALSE;
+	END_IF]]></ST>
+    </Implementation>
+    <Method Name="FB_Init" Id="{26790632-836f-490b-9f75-31139a119023}">
+      <Declaration><![CDATA[//FB_Init は常に暗黙的に使用可能で、主に初期化に使用されます。
+//戻り値は評価されません。特定の結果を得るために、メソッドを明示的に宣言し、
+//そのメソッドに標準の初期化コードをもったコードを追加することができます。戻り値を評価できます。
+METHOD FB_Init: BOOL
+VAR_INPUT
+    bInitRetains: BOOL; // TRUE: 保持変数は初期化されます (ウォーム リセット、あるいはコールド リセット)
+    bInCopyCode: BOOL;  // TRUE: 後でコードをコピーする (オンライン変更) ために、インスタンスをコピーします。
+END_VAR]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[IF bInCopyCode = FALSE THEN
+	
+	//継承元のファンクションブロックの読み込むイベントのフィルター設定、アラームをフィルタリング
+	fbListenerFilter.Clear().IsAlarm();
+	
+	//設定したフィルターを設定する
+	SUPER^.Subscribe2(fbListenerFilter);
+
+END_IF]]></ST>
+      </Implementation>
+    </Method>
+    <Method Name="OnAlarmCleared" Id="{c11013c1-e76b-4ee0-89ee-ed0b20a6aa92}">
+      <Declaration><![CDATA[METHOD OnAlarmCleared : Tc3_EventLogger.HRESULT
+VAR_INPUT
+	fbEvent	: REFERENCE TO Tc3_EventLogger.FB_TcEvent;
+END_VAR
+]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[CASE fbEvent.eSeverity OF 
+	TcEventSeverity.Critical:
+		liCriticalActiveCount:=liCriticalActiveCount-1;
+		
+	TcEventSeverity.Error:
+		liErrorActiveCount:=liErrorActiveCount-1;
+		
+	TcEventSeverity.Warning:
+		liWarningActiveCount:=liWarningActiveCount-1;
+END_CASE
+
+OnAlarmCleared:=S_OK;]]></ST>
+      </Implementation>
+    </Method>
+    <Method Name="OnAlarmRaised" Id="{283ef791-005d-42c7-9741-c93537e76065}">
+      <Declaration><![CDATA[METHOD OnAlarmRaised : Tc3_EventLogger.HRESULT
+VAR_INPUT
+	fbEvent	: REFERENCE TO Tc3_EventLogger.FB_TcEvent;
+END_VAR
+]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[CASE fbEvent.eSeverity OF 
+	TcEventSeverity.Critical:
+		liCriticalActiveCount:=liCriticalActiveCount+1;
+		
+	TcEventSeverity.Error:
+		liErrorActiveCount:=liErrorActiveCount+1;
+		
+	TcEventSeverity.Warning:
+		liWarningActiveCount:=liWarningActiveCount+1;
+END_CASE
+
+OnAlarmRaised:=S_OK;]]></ST>
+      </Implementation>
+    </Method>
+    <LineIds Name="FB_MachineState">
+      <LineId Id="1" Count="27" />
+    </LineIds>
+    <LineIds Name="FB_MachineState.FB_Init">
+      <LineId Id="1" Count="8" />
+    </LineIds>
+    <LineIds Name="FB_MachineState.OnAlarmCleared">
+      <LineId Id="1" Count="11" />
+    </LineIds>
+    <LineIds Name="FB_MachineState.OnAlarmRaised">
+      <LineId Id="1" Count="11" />
+    </LineIds>
+  </POU>
+</TcPlcObject>

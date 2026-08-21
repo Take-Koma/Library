@@ -621,6 +621,7 @@
 			<Project File="Wago7871664000080.xti"/>
 			<Project File="DiagnosisEtherCAT.xti"/>
 			<Project File="DiagnosisIOLinkMaster.xti"/>
+			<Project File="MachineControl.xti"/>
 		</Plc>
 	</Project>
 </TcSmProject>
