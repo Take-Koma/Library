@@ -2,8 +2,8 @@
 <TcPlcObject Version="1.1.0.1">
   <POU Name="FB_AlarmListener" Id="{c9d0ed7a-eca4-4cf8-b2f3-c7311026fcca}" SpecialFunc="None">
     <Declaration><![CDATA[FUNCTION_BLOCK FB_AlarmListener EXTENDS FB_ListenerBase2
-VAR_OUTPUT
-	aEvents        				:ARRAY[1..GVL.uiAlarmMaxCount] OF ST_EventRead;
+VAR_IN_OUT
+	aEvents        				:ARRAY[*] OF ST_EventRead;
 END_VAR
 VAR
 	tzinfo 						:ST_TimeZoneInformation;
@@ -183,7 +183,8 @@ OnAlarmRaised:=S_OK;]]></ST>
       </Implementation>
     </Method>
     <LineIds Name="FB_AlarmListener">
-      <LineId Id="1" Count="11" />
+      <LineId Id="13" Count="0" />
+      <LineId Id="2" Count="10" />
     </LineIds>
     <LineIds Name="FB_AlarmListener.Execute">
       <LineId Id="1" Count="32" />

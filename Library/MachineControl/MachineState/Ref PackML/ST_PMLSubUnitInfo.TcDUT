@@ -1,0 +1,12 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1">
+  <DUT Name="ST_PMLSubUnitInfo" Id="{1482e3c0-0723-4cff-92f7-18c9bee98f71}">
+    <Declaration><![CDATA[TYPE ST_PMLSubUnitInfo :
+STRUCT
+    bActive  : BOOL;
+    eState   : E_PMLState;
+END_STRUCT
+END_TYPE
+]]></Declaration>
+  </DUT>
+</TcPlcObject>

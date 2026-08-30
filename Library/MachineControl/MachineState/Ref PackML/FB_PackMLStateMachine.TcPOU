@@ -1,0 +1,536 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1">
+  <POU Name="FB_PackMLStateMachine" Id="{cf7e90d4-3aad-4ab5-82e1-f33dada3ea03}" SpecialFunc="None">
+    <Declaration><![CDATA[FUNCTION_BLOCK FB_PackMLStateMachine
+VAR_INPUT
+	eUnitMode 			: E_PMLUnitMode;
+	eCommand			: E_PMLCommand;
+END_VAR
+VAR_IN_OUT
+	stSubUnitInfo		: ARRAY[*] OF ST_PMLSubUnitInfo; 
+END_VAR
+VAR_OUTPUT
+	eState				: E_PMLState := E_PMLState.IDLE;
+	Error 				: BOOL;
+	ErrorID 			: UDINT;
+END_VAR
+VAR
+	eCommandPrev		: E_PMLCommand;
+	bCommandRise		: BOOL;
+END_VAR
+]]></Declaration>
+    <Implementation>
+      <ST><![CDATA[// コマンドの立ち上がり検出 (前回スキャンから変更があった場合のみ受付)
+bCommandRise := (eCommand <> E_PMLCommand.Undefined) AND (eCommand <> eCommandPrev);
+eCommandPrev := eCommand;
+
+//ステートチェンジ判定
+Error 	:= FALSE;
+ErrorID := 0;
+
+CASE eUnitMode OF
+	
+	E_PMLUnitMode.Production:
+		StateMachine_Production();
+		
+	E_PMLUnitMode.Maintenance:
+		StateMachine_Maintenance();
+		
+	E_PMLUnitMode.Manual:
+		StateMachine_Manual();
+		
+END_CASE
+
+]]></ST>
+    </Implementation>
+    <Method Name="StateMachine_Maintenance" Id="{e6820e7a-bec5-4535-b0f7-a72f6e3a959d}">
+      <Declaration><![CDATA[METHOD StateMachine_Maintenance
+]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[CASE eState OF
+	E_PMLState.Undefined:
+		
+		IF eCommand=E_PMLCommand.Abort THEN
+			eState	:= E_PMLState.ABORTING;
+		ELSIF eCommand=E_PMLCommand.Stop THEN
+			eState	:= E_PMLState.STOPPING;
+		ELSIF bCommandRise THEN
+			Error 	:= TRUE;
+			ErrorID	:= 1;
+		END_IF
+
+	E_PMLState.IDLE:
+		
+		IF eCommand=E_PMLCommand.Abort THEN
+			eState	:= E_PMLState.ABORTING;
+		ELSIF eCommand=E_PMLCommand.Stop THEN
+			eState	:= E_PMLState.STOPPING;
+		ELSIF eCommand=E_PMLCommand.Start THEN
+			eState	:= E_PMLState.Starting;
+		ELSIF bCommandRise THEN
+			Error 	:= TRUE;
+			ErrorID	:= 1;
+		END_IF
+
+	E_PMLState.STARTING:
+
+		IF eCommand=E_PMLCommand.Abort THEN
+			eState	:= E_PMLState.ABORTING;
+		ELSIF eCommand=E_PMLCommand.Stop THEN
+			eState	:= E_PMLState.STOPPING;
+		ELSIF SubUnitStateComplete(eTarget:=E_PMLState.EXECUTE) THEN
+			eState	:= E_PMLState.EXECUTE;
+		END_IF
+
+	E_PMLState.EXECUTE:
+		
+		IF eCommand=E_PMLCommand.Abort THEN
+			eState	:= E_PMLState.ABORTING;
+		ELSIF eCommand=E_PMLCommand.Stop THEN
+			eState	:= E_PMLState.STOPPING;
+		ELSIF eCOmmand=E_PMLCommand.Hold THEN
+			eState	:= E_PMLState.Holding;
+		ELSIF bCommandRise THEN
+			Error 	:= TRUE;
+			ErrorID	:= 1;
+		END_IF
+
+	E_PMLState.RESETTING:
+
+		IF eCommand=E_PMLCommand.Abort THEN
+			eState	:= E_PMLState.ABORTING;
+		ELSIF eCommand=E_PMLCommand.Stop THEN
+			eState	:= E_PMLState.STOPPING;
+		ELSIF SubUnitStateComplete(eTarget:=E_PMLState.IDLE) THEN
+			eState	:= E_PMLState.IDLE;
+		END_IF
+	
+	E_PMLState.Holding:
+		
+		IF eCommand=E_PMLCommand.Abort THEN
+			eState	:= E_PMLState.ABORTING;
+		ELSIF eCommand=E_PMLCommand.Stop THEN
+			eState	:= E_PMLState.STOPPING;
+		ELSIF SubUnitStateComplete(eTarget:=E_PMLState.Held) THEN
+			eState	:= E_PMLState.Held;
+		END_IF
+
+	E_PMLState.Held:
+	
+		IF eCommand=E_PMLCommand.Abort THEN
+			eState	:= E_PMLState.ABORTING;
+		ELSIF eCommand=E_PMLCommand.Stop THEN
+			eState	:= E_PMLState.STOPPING;
+		ELSIF eCOmmand=E_PMLCommand.Unhold THEN
+			eState	:= E_PMLState.Unholding;
+		ELSIF bCommandRise THEN
+			Error 	:= TRUE;
+			ErrorID	:= 1;
+		END_IF
+
+	E_PMLState.Unholding:
+	
+		IF eCommand=E_PMLCommand.Abort THEN
+			eState	:= E_PMLState.ABORTING;
+		ELSIF eCommand=E_PMLCommand.Stop THEN
+			eState	:= E_PMLState.STOPPING;
+		ELSIF SubUnitStateComplete(eTarget:=E_PMLState.EXECUTE) THEN
+			eState	:= E_PMLState.EXECUTE;
+		END_IF
+
+	E_PMLState.STOPPING:
+
+		IF eCommand=E_PMLCommand.Abort THEN
+			eState	:= E_PMLState.ABORTING;
+		ELSIF SubUnitStateComplete(eTarget:=E_PMLState.STOPPED) THEN
+			eState	:= E_PMLState.STOPPED;
+		END_IF
+
+	E_PMLState.STOPPED:
+
+		IF eCommand=E_PMLCommand.Abort THEN
+			eState	:= E_PMLState.ABORTING;
+		ELSIF eCommand=E_PMLCommand.Reset THEN
+			eState	:= E_PMLState.Resetting;
+		ELSIF bCommandRise THEN
+			Error 	:= TRUE;
+			ErrorID	:= 1;
+		END_IF
+
+	E_PMLState.ABORTING:
+
+		IF SubUnitStateComplete(eTarget:=E_PMLState.Aborted) THEN
+			eState	:= E_PMLState.Aborted;
+		END_IF
+
+	E_PMLState.ABORTED:
+
+		IF eCommand=E_PMLCommand.Clear THEN
+			eState	:= E_PMLState.Clearing;
+		ELSIF bCommandRise THEN
+			Error 	:= TRUE;
+			ErrorID	:= 1;
+		END_IF
+
+	E_PMLState.CLEARING:
+
+		IF eCommand=E_PMLCommand.Abort THEN
+			eState	:= E_PMLState.ABORTING;
+		ELSIF SubUnitStateComplete(eTarget:=E_PMLState.STOPPED) THEN
+			eState	:= E_PMLState.STOPPED;
+		END_IF
+
+END_CASE
+]]></ST>
+      </Implementation>
+    </Method>
+    <Method Name="StateMachine_Manual" Id="{bb7bd523-2822-4c51-837f-e2f4b0539b59}">
+      <Declaration><![CDATA[METHOD StateMachine_Manual
+]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[CASE eState OF
+	E_PMLState.Undefined:
+		
+		IF eCommand=E_PMLCommand.Abort THEN
+			eState	:= E_PMLState.ABORTING;
+		ELSIF eCommand=E_PMLCommand.Stop THEN
+			eState	:= E_PMLState.STOPPING;
+		ELSIF bCommandRise THEN
+			Error 	:= TRUE;
+			ErrorID	:= 1;
+		END_IF
+
+	E_PMLState.IDLE:
+		
+		IF eCommand=E_PMLCommand.Abort THEN
+			eState	:= E_PMLState.ABORTING;
+		ELSIF eCommand=E_PMLCommand.Stop THEN
+			eState	:= E_PMLState.STOPPING;
+		ELSIF eCommand=E_PMLCommand.Start THEN
+			eState	:= E_PMLState.Starting;
+		ELSIF bCommandRise THEN
+			Error 	:= TRUE;
+			ErrorID	:= 1;
+		END_IF
+
+	E_PMLState.STARTING:
+
+		IF eCommand=E_PMLCommand.Abort THEN
+			eState	:= E_PMLState.ABORTING;
+		ELSIF eCommand=E_PMLCommand.Stop THEN
+			eState	:= E_PMLState.STOPPING;
+		ELSIF SubUnitStateComplete(eTarget:=E_PMLState.EXECUTE) THEN
+			eState	:= E_PMLState.EXECUTE;
+		END_IF
+
+	E_PMLState.EXECUTE:
+		
+		IF eCommand=E_PMLCommand.Abort THEN
+			eState	:= E_PMLState.ABORTING;
+		ELSIF eCommand=E_PMLCommand.Stop THEN
+			eState	:= E_PMLState.STOPPING;
+		ELSIF bCommandRise THEN
+			Error 	:= TRUE;
+			ErrorID	:= 1;
+		END_IF
+
+
+	E_PMLState.RESETTING:
+
+		IF eCommand=E_PMLCommand.Abort THEN
+			eState	:= E_PMLState.ABORTING;
+		ELSIF eCommand=E_PMLCommand.Stop THEN
+			eState	:= E_PMLState.STOPPING;
+		ELSIF SubUnitStateComplete(eTarget:=E_PMLState.IDLE) THEN
+			eState	:= E_PMLState.IDLE;
+		END_IF
+
+	E_PMLState.STOPPING:
+
+		IF eCommand=E_PMLCommand.Abort THEN
+			eState	:= E_PMLState.ABORTING;
+		ELSIF SubUnitStateComplete(eTarget:=E_PMLState.STOPPED) THEN
+			eState	:= E_PMLState.STOPPED;
+		END_IF
+
+	E_PMLState.STOPPED:
+
+		IF eCommand=E_PMLCommand.Abort THEN
+			eState	:= E_PMLState.ABORTING;
+		ELSIF eCommand=E_PMLCommand.Reset THEN
+			eState	:= E_PMLState.Resetting;
+		ELSIF bCommandRise THEN
+			Error 	:= TRUE;
+			ErrorID	:= 1;
+		END_IF
+
+	E_PMLState.ABORTING:
+
+		IF SubUnitStateComplete(eTarget:=E_PMLState.Aborted) THEN
+			eState	:= E_PMLState.Aborted;
+		END_IF
+
+	E_PMLState.ABORTED:
+
+		IF eCommand=E_PMLCommand.Clear THEN
+			eState	:= E_PMLState.Clearing;
+		ELSIF bCommandRise THEN
+			Error 	:= TRUE;
+			ErrorID	:= 1;
+		END_IF
+
+	E_PMLState.CLEARING:
+
+		IF eCommand=E_PMLCommand.Abort THEN
+			eState	:= E_PMLState.ABORTING;
+		ELSIF SubUnitStateComplete(eTarget:=E_PMLState.STOPPED) THEN
+			eState	:= E_PMLState.STOPPED;
+		END_IF
+
+END_CASE
+]]></ST>
+      </Implementation>
+    </Method>
+    <Method Name="StateMachine_Production" Id="{6ea19434-5511-41c4-9812-71c4af045ab2}">
+      <Declaration><![CDATA[METHOD StateMachine_Production
+]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[CASE eState OF
+	E_PMLState.Undefined:
+		
+		IF eCommand=E_PMLCommand.Abort THEN
+			eState	:= E_PMLState.ABORTING;
+		ELSIF eCommand=E_PMLCommand.Stop THEN
+			eState	:= E_PMLState.STOPPING;
+		ELSIF bCommandRise THEN
+			Error 	:= TRUE;
+			ErrorID	:= 1;
+		END_IF
+
+	E_PMLState.IDLE:
+		
+		IF eCommand=E_PMLCommand.Abort THEN
+			eState	:= E_PMLState.ABORTING;
+		ELSIF eCommand=E_PMLCommand.Stop THEN
+			eState	:= E_PMLState.STOPPING;
+		ELSIF eCommand=E_PMLCommand.Start THEN
+			eState	:= E_PMLState.Starting;
+		ELSIF bCommandRise THEN
+			Error 	:= TRUE;
+			ErrorID	:= 1;
+		END_IF
+
+	E_PMLState.STARTING:
+
+		IF eCommand=E_PMLCommand.Abort THEN
+			eState	:= E_PMLState.ABORTING;
+		ELSIF eCommand=E_PMLCommand.Stop THEN
+			eState	:= E_PMLState.STOPPING;
+		ELSIF SubUnitStateComplete(eTarget:=E_PMLState.EXECUTE) THEN
+			eState	:= E_PMLState.EXECUTE;
+		END_IF
+
+	E_PMLState.EXECUTE:
+		
+		IF eCommand=E_PMLCommand.Abort THEN
+			eState	:= E_PMLState.ABORTING;
+		ELSIF eCommand=E_PMLCommand.Stop THEN
+			eState	:= E_PMLState.STOPPING;
+		ELSIF eCommand=E_PMLCommand.Suspend THEN
+			eState	:= E_PMLState.Suspending;
+		ELSIF eCOmmand=E_PMLCommand.Hold THEN
+			eState	:= E_PMLState.Holding;
+		ELSIF eCOmmand=E_PMLCommand.Complete THEN
+			eState	:= E_PMLState.Completing;		
+		ELSIF bCommandRise THEN
+			Error 	:= TRUE;
+			ErrorID	:= 1;
+		END_IF
+
+	E_PMLState.Completing:
+	
+		IF eCommand=E_PMLCommand.Abort THEN
+			eState	:= E_PMLState.ABORTING;
+		ELSIF eCommand=E_PMLCommand.Stop THEN
+			eState	:= E_PMLState.STOPPING;
+		ELSIF SubUnitStateComplete(eTarget:=E_PMLState.Completed) THEN
+			eState	:= E_PMLState.Completed;
+		END_IF
+
+	E_PMLState.Completed:
+		
+		IF eCommand=E_PMLCommand.Abort THEN
+			eState	:= E_PMLState.ABORTING;
+		ELSIF eCommand=E_PMLCommand.Stop THEN
+			eState	:= E_PMLState.STOPPING;
+		ELSIF eCommand=E_PMLCommand.Reset THEN
+			eState	:= E_PMLState.Resetting;
+		ELSIF bCommandRise THEN
+			Error 	:= TRUE;
+			ErrorID	:= 1;
+		END_IF
+
+	E_PMLState.RESETTING:
+
+		IF eCommand=E_PMLCommand.Abort THEN
+			eState	:= E_PMLState.ABORTING;
+		ELSIF eCommand=E_PMLCommand.Stop THEN
+			eState	:= E_PMLState.STOPPING;
+		ELSIF SubUnitStateComplete(eTarget:=E_PMLState.IDLE) THEN
+			eState	:= E_PMLState.IDLE;
+		END_IF
+
+	E_PMLState.Holding:
+		
+		IF eCommand=E_PMLCommand.Abort THEN
+			eState	:= E_PMLState.ABORTING;
+		ELSIF eCommand=E_PMLCommand.Stop THEN
+			eState	:= E_PMLState.STOPPING;
+		ELSIF SubUnitStateComplete(eTarget:=E_PMLState.Held) THEN
+			eState	:= E_PMLState.Held;
+		END_IF
+
+	E_PMLState.Held:
+	
+		IF eCommand=E_PMLCommand.Abort THEN
+			eState	:= E_PMLState.ABORTING;
+		ELSIF eCommand=E_PMLCommand.Stop THEN
+			eState	:= E_PMLState.STOPPING;
+		ELSIF eCOmmand=E_PMLCommand.Unhold THEN
+			eState	:= E_PMLState.Unholding;
+		ELSIF bCommandRise THEN
+			Error 	:= TRUE;
+			ErrorID	:= 1;
+		END_IF
+
+	E_PMLState.Unholding:
+	
+		IF eCommand=E_PMLCommand.Abort THEN
+			eState	:= E_PMLState.ABORTING;
+		ELSIF eCommand=E_PMLCommand.Stop THEN
+			eState	:= E_PMLState.STOPPING;
+		ELSIF SubUnitStateComplete(eTarget:=E_PMLState.EXECUTE) THEN
+			eState	:= E_PMLState.EXECUTE;
+		END_IF
+
+	E_PMLState.Suspending:
+	
+		IF eCommand=E_PMLCommand.Abort THEN
+			eState	:= E_PMLState.ABORTING;
+		ELSIF eCommand=E_PMLCommand.Stop THEN
+			eState	:= E_PMLState.STOPPING;
+		ELSIF SubUnitStateComplete(eTarget:=E_PMLState.Suspended) THEN
+			eState	:= E_PMLState.Suspended;
+		END_IF
+
+	E_PMLState.Suspended:
+	
+		IF eCommand=E_PMLCommand.Abort THEN
+			eState	:= E_PMLState.ABORTING;
+		ELSIF eCommand=E_PMLCommand.Stop THEN
+			eState	:= E_PMLState.STOPPING;
+		ELSIF eCOmmand=E_PMLCommand.Unsuspend THEN
+			eState	:= E_PMLState.Unsuspending;
+		ELSIF bCommandRise THEN
+			Error 	:= TRUE;
+			ErrorID	:= 1;
+		END_IF
+	
+	E_PMLState.Unsuspending:
+	
+		IF eCommand=E_PMLCommand.Abort THEN
+			eState	:= E_PMLState.ABORTING;
+		ELSIF eCommand=E_PMLCommand.Stop THEN
+			eState	:= E_PMLState.STOPPING;
+		ELSIF SubUnitStateComplete(eTarget:=E_PMLState.EXECUTE) THEN
+			eState	:= E_PMLState.EXECUTE;
+		END_IF
+
+	E_PMLState.STOPPING:
+
+		IF eCommand=E_PMLCommand.Abort THEN
+			eState	:= E_PMLState.ABORTING;
+		ELSIF SubUnitStateComplete(eTarget:=E_PMLState.STOPPED) THEN
+			eState	:= E_PMLState.STOPPED;
+		END_IF
+
+	E_PMLState.STOPPED:
+
+		IF eCommand=E_PMLCommand.Abort THEN
+			eState	:= E_PMLState.ABORTING;
+		ELSIF eCommand=E_PMLCommand.Reset THEN
+			eState	:= E_PMLState.Resetting;
+		ELSIF bCommandRise THEN
+			Error 	:= TRUE;
+			ErrorID	:= 1;
+		END_IF
+
+	E_PMLState.ABORTING:
+
+		IF SubUnitStateComplete(eTarget:=E_PMLState.Aborted) THEN
+			eState	:= E_PMLState.Aborted;
+		END_IF
+
+	E_PMLState.ABORTED:
+
+		IF eCommand=E_PMLCommand.Clear THEN
+			eState	:= E_PMLState.Clearing;
+		ELSIF bCommandRise THEN
+			Error 	:= TRUE;
+			ErrorID	:= 1;
+		END_IF
+
+	E_PMLState.CLEARING:
+
+		IF eCommand=E_PMLCommand.Abort THEN
+			eState	:= E_PMLState.ABORTING;
+		ELSIF SubUnitStateComplete(eTarget:=E_PMLState.STOPPED) THEN
+			eState	:= E_PMLState.STOPPED;
+		END_IF
+
+END_CASE
+]]></ST>
+      </Implementation>
+    </Method>
+    <Method Name="SubUnitStateComplete" Id="{ffee066b-ec87-4feb-94d3-ea6f9f189795}">
+      <Declaration><![CDATA[METHOD SubUnitStateComplete :BOOL
+VAR_INPUT
+    eTarget	: E_PMLState;
+END_VAR
+VAR
+	i					: DINT;	
+END_VAR
+]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[FOR i := LOWER_BOUND(stSubUnitInfo,1) TO UPPER_BOUND(stSubUnitInfo,1) DO
+	IF stSubUnitInfo[i].bActive AND_THEN stSubUnitInfo[i].eState <> eTarget THEN
+		SubUnitStateComplete := FALSE;
+		RETURN;
+	END_IF
+END_FOR
+ 
+SubUnitStateComplete := TRUE;]]></ST>
+      </Implementation>
+    </Method>
+    <LineIds Name="FB_PackMLStateMachine">
+      <LineId Id="42" Count="1" />
+      <LineId Id="2" Count="0" />
+      <LineId Id="21" Count="5" />
+      <LineId Id="41" Count="0" />
+      <LineId Id="27" Count="11" />
+    </LineIds>
+    <LineIds Name="FB_PackMLStateMachine.StateMachine_Maintenance">
+      <LineId Id="136" Count="133" />
+      <LineId Id="135" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_PackMLStateMachine.StateMachine_Manual">
+      <LineId Id="1" Count="100" />
+    </LineIds>
+    <LineIds Name="FB_PackMLStateMachine.StateMachine_Production">
+      <LineId Id="1" Count="194" />
+    </LineIds>
+    <LineIds Name="FB_PackMLStateMachine.SubUnitStateComplete">
+      <LineId Id="1" Count="7" />
+    </LineIds>
+  </POU>
+</TcPlcObject>

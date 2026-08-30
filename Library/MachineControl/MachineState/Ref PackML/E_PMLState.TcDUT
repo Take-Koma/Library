@@ -1,0 +1,31 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1">
+  <DUT Name="E_PMLState" Id="{90e76fea-faaf-4fae-9a94-91c7a0248ec9}">
+    <Declaration><![CDATA[{attribute 'qualified_only'}
+{attribute 'strict'}
+{attribute 'to_string'}
+TYPE E_PMLState : 
+(
+	Undefined		:= 0,
+	Clearing		:= 1,		//Clearing（異常解除中）		Acting	Abort後の異常解除およびStopped状態への移行中
+	Stopped			:= 2,		//Stopped（停止）				Wait	制御された停止状態、再開にはリセット（Reset）が必要
+	Starting		:= 3,		//Starting（開始中）			Acting	生産に向けて稼働を立ち上げ中
+	Idle			:= 4,		//Idle（待機）					Wait	開始準備完了、開始（Start）指令待ち
+	Suspended		:= 5,		//Suspended（中断）				Wait	外部要因（上流・下流工程など）による一時停止
+	Execute			:= 6,		//Execute（実行中）				Acting	生産中（稼働状態）
+	Stopping		:= 7,		//Stopping（停止処理中）		Acting	制御された減速による停止（Stopped）への移行
+	Aborting		:= 8,		//Aborting（異常停止中）		Acting	緊急停止シーケンスの実行中
+	Aborted			:= 9,		//Aborted（異常停止）			Wait	異常状態、異常の解消とリセット（Reset）が必要
+	Holding			:= 10,		//Holding（一時停止中）			Acting	Held状態へ移行中
+	Held			:= 11,		//Held（一時停止）				Wait	オペレーターによる一時停止
+	Unholding		:= 12,		//Unholding（一時停止解除中）	Acting	Held状態からExecute状態へ復帰中
+	Suspending		:= 13,		//Suspending（中断中）			Acting	外部要因によりSuspended状態へ移行中
+	Unsuspending	:= 14,		//Unsuspending（中断解除中）	Acting	Suspended状態からExecute状態へ復帰中
+	Resetting		:= 15,		//Resetting（リセット中）		Acting	Idle状態への復帰準備中
+	Completing		:= 16,		//Completing（完了処理中）		Acting	現在の生産サイクルを終了中
+	Completed		:= 17		//Complete（完了）				Wait	サイクル終了、リセット（Reset）待ち
+);
+END_TYPE
+]]></Declaration>
+  </DUT>
+</TcPlcObject>

@@ -1,0 +1,219 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1">
+  <POU Name="FB_MachineState_Sample" Id="{b7081430-f289-411b-b4cd-ee26d77128ff}" SpecialFunc="None">
+    <Declaration><![CDATA[FUNCTION_BLOCK FB_MachineState_Sample EXTENDS FB_ListenerBase2
+VAR_INPUT
+    // 操作コマンド
+    bStart                  : BOOL; // 運転開始指令
+    bStop                   : BOOL; // 停止指令
+    bReset                  : BOOL; // リセット/復旧指令
+    bAbort                  : BOOL; // 手動非常停止指令
+
+    // 各Acting Stateの完了通知（外部シーケンスや軸処理から受領）
+    bResetDone              : BOOL; // 原点復帰・復旧完了
+    bStartDone              : BOOL; // 起動準備完了
+    bStopDone               : BOOL; // 停止動作完了
+    bAbortDone              : BOOL; // 安全遮断完了
+
+    // モード切替要求
+    eRequestedUnitMode      : E_PMLUnitMode := E_PMLUnitMode.Production;
+END_VAR
+
+VAR_OUTPUT
+    eMachineState           : E_PMLState := E_PMLState.Stopped;
+    eUnitMode               : E_PMLUnitMode := E_PMLUnitMode.Production;
+    bStopMachine            : BOOL; // 全軸停止・動作禁止指示
+    bAllowManual            : BOOL; // 手動操作許可フラグ
+END_VAR
+
+VAR
+    fbListenerFilter        : FB_TcEventFilter;
+
+    liCriticalActiveCount   : LINT := 0; // クリティカル発生数
+    liErrorActiveCount      : LINT := 0; // エラー発生数
+    liWarningActiveCount    : LINT := 0; // ワーニング発生数
+    
+    bModeChangeRejected     : BOOL;
+END_VAR
+]]></Declaration>
+    <Implementation>
+      <ST><![CDATA[//--- 1. Listener基底クラスの実行 ---
+SUPER^.Execute();
+
+//--- 2. EventLoggerアラームによる最優先ステート遷移（割り込み） ---
+// Critical発生 -> Aborting へ強制遷移
+IF (bCritical OR liCriticalActiveCount > 0) AND 
+   (eMachineState <> E_PMLState.Aborting AND eMachineState <> E_PMLState.Aborted) THEN
+    eMachineState := E_PMLState.Aborting;
+
+// Error発生 -> Stopping へ強制遷移
+ELSIF (bError OR liErrorActiveCount > 0) AND 
+      (eMachineState <> E_PMLState.Stopping AND eMachineState <> E_PMLState.Stopped AND 
+       eMachineState <> E_PMLState.Aborting AND eMachineState <> E_PMLState.Aborted) THEN
+    eMachineState := E_PMLState.Stopping;
+END_IF
+
+// 手動Abortコマンド
+IF bAbort AND (eMachineState <> E_PMLState.Aborting AND eMachineState <> E_PMLState.Aborted) THEN
+    eMachineState := E_PMLState.Aborting;
+END_IF
+
+//--- 3. ユニットモード切替（静止状態でのみ許可） ---
+IF eRequestedUnitMode <> eUnitMode THEN
+    IF (eMachineState = E_PMLState.Stopped) OR (eMachineState = E_PMLState.Idle) OR (eMachineState = E_PMLState.Aborted) THEN
+        eUnitMode := eRequestedUnitMode;
+        bModeChangeRejected := FALSE;
+    ELSE
+        bModeChangeRejected := TRUE; // 稼働中のモード変更拒否
+    END_IF
+END_IF
+
+//--- 4. PackML コアステートマシン ---
+CASE eMachineState OF
+
+    E_PMLState.Aborting: // 非常停止処理中
+        bStopMachine := TRUE;
+        bAllowManual := FALSE;
+        IF bAbortDone OR (NOT bCritical AND liCriticalActiveCount = 0) THEN
+            eMachineState := E_PMLState.Aborted;
+        END_IF
+
+    E_PMLState.Aborted: // 非常停止完了・復旧待ち
+        bStopMachine := TRUE;
+        bAllowManual := FALSE;
+        IF bReset AND (NOT bCritical AND liCriticalActiveCount = 0) THEN
+            eMachineState := E_PMLState.Resetting;
+        END_IF
+
+    E_PMLState.Stopping: // 通常停止処理中
+        bStopMachine := TRUE;
+        bAllowManual := FALSE;
+        IF bStopDone THEN
+            eMachineState := E_PMLState.Stopped;
+        END_IF
+
+    E_PMLState.Stopped: // 停止中（リセット待ち）
+        bStopMachine := TRUE;
+        // Manualモード時かつエラーがなければ手動操作を許可する設計例
+        bAllowManual := (eUnitMode = E_PMLUnitMode.Manual) AND (liErrorActiveCount = 0);
+        
+        IF bReset AND (liErrorActiveCount = 0) THEN
+            eMachineState := E_PMLState.Resetting;
+        END_IF
+
+    E_PMLState.Resetting: // 復旧・原点復帰中
+        bStopMachine := FALSE;
+        bAllowManual := FALSE;
+        IF bResetDone THEN
+            eMachineState := E_PMLState.Idle;
+        END_IF
+
+    E_PMLState.Idle: // 運転準備完了
+        bStopMachine := FALSE;
+        bAllowManual := (eUnitMode = E_PMLUnitMode.Manual);
+        
+        IF bStart THEN
+            IF eUnitMode = E_PMLUnitMode.Manual THEN
+                // ManualモードならStartで直接Executeへ（またはIdleのまま手動操作）
+                eMachineState := E_PMLState.Execute;
+            ELSE
+                eMachineState := E_PMLState.Starting;
+            END_IF
+        ELSIF bStop THEN
+            eMachineState := E_PMLState.Stopping;
+        END_IF
+
+    E_PMLState.Starting: // 自動運転の開始処理（コンベア起動等）
+        bStopMachine := FALSE;
+        bAllowManual := FALSE;
+        IF bStartDone THEN
+            eMachineState := E_PMLState.Execute;
+        ELSIF bStop THEN
+            eMachineState := E_PMLState.Stopping;
+        END_IF
+
+    E_PMLState.Execute: // 運転中
+        bStopMachine := FALSE;
+        bAllowManual := (eUnitMode = E_PMLUnitMode.Manual);
+        
+        IF bStop THEN
+            eMachineState := E_PMLState.Stopping;
+        END_IF
+
+END_CASE]]></ST>
+    </Implementation>
+    <Method Name="OnAlarmCleared" Id="{25c38a1a-08e7-4526-b959-165416e7c536}">
+      <Declaration><![CDATA[{warning 'メソッド実装を追加'}
+METHOD OnAlarmCleared : Tc3_EventLogger.HRESULT
+VAR_INPUT
+	fbEvent	: REFERENCE TO Tc3_EventLogger.FB_TcEvent;
+END_VAR
+]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[]]></ST>
+      </Implementation>
+    </Method>
+    <Method Name="OnAlarmConfirmed" Id="{b2b4aecd-b727-4f2e-9b77-00d03f846cb2}">
+      <Declaration><![CDATA[{warning 'メソッド実装を追加'}
+METHOD OnAlarmConfirmed : Tc3_EventLogger.HRESULT
+VAR_INPUT
+	fbEvent	: REFERENCE TO Tc3_EventLogger.FB_TcEvent;
+END_VAR
+]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[]]></ST>
+      </Implementation>
+    </Method>
+    <Method Name="OnAlarmDisposed" Id="{5da31281-943d-46fd-b833-e50d3b9e5b75}">
+      <Declaration><![CDATA[{warning 'メソッド実装を追加'}
+METHOD OnAlarmDisposed : Tc3_EventLogger.HRESULT
+VAR_INPUT
+	fbEvent	: REFERENCE TO Tc3_EventLogger.FB_TcEvent;
+END_VAR
+]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[]]></ST>
+      </Implementation>
+    </Method>
+    <Method Name="OnAlarmRaised" Id="{498a507f-b70c-4355-9426-08eaa03a8cfc}">
+      <Declaration><![CDATA[{warning 'メソッド実装を追加'}
+METHOD OnAlarmRaised : Tc3_EventLogger.HRESULT
+VAR_INPUT
+	fbEvent	: REFERENCE TO Tc3_EventLogger.FB_TcEvent;
+END_VAR
+]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[]]></ST>
+      </Implementation>
+    </Method>
+    <Method Name="OnMessageSent" Id="{624ddb03-37cb-4aaa-b256-8b487a8397ab}">
+      <Declaration><![CDATA[{warning 'メソッド実装を追加'}
+METHOD OnMessageSent : Tc3_EventLogger.HRESULT
+VAR_INPUT
+	fbEvent	: REFERENCE TO Tc3_EventLogger.FB_TcEvent;
+END_VAR
+]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[]]></ST>
+      </Implementation>
+    </Method>
+    <LineIds Name="FB_MachineState_Sample">
+      <LineId Id="1" Count="103" />
+    </LineIds>
+    <LineIds Name="FB_MachineState_Sample.OnAlarmCleared">
+      <LineId Id="1" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_MachineState_Sample.OnAlarmConfirmed">
+      <LineId Id="1" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_MachineState_Sample.OnAlarmDisposed">
+      <LineId Id="1" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_MachineState_Sample.OnAlarmRaised">
+      <LineId Id="1" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_MachineState_Sample.OnMessageSent">
+      <LineId Id="1" Count="0" />
+    </LineIds>
+  </POU>
+</TcPlcObject>

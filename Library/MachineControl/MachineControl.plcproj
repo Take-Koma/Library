@@ -47,6 +47,9 @@
     <Folder Include="Alarm" />
     <Folder Include="EventRead" />
     <Folder Include="MachineState" />
+    <Folder Include="MachineState\Original" />
+    <Folder Include="MachineState\Ref PackML" />
+    <Folder Include="MachineState\Ref PackML\Ref Code" />
     <Folder Include="Version" />
   </ItemGroup>
   <ItemGroup>
@@ -85,21 +88,62 @@
     <Compile Include="EventRead\ST_EventRead.TcDUT">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="MachineState\E_MachineState.TcDUT">
+    <Compile Include="MachineState\FB_MachineState_Sample.TcPOU">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="MachineState\FB_MachineState.TcPOU">
+    <Compile Include="MachineState\Original\E_MachineState.TcDUT">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="MachineState\Original\FB_MachineState.TcPOU">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="MachineState\Ref PackML\E_PMLCommand.TcDUT">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="MachineState\Ref PackML\E_PMLState.TcDUT">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="MachineState\Ref PackML\E_PMLUnitMode.TcDUT">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="MachineState\Ref PackML\FB_PackMLStateMachine.TcPOU">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="MachineState\Ref PackML\FB_PackMLUnitModeManager.TcPOU">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="MachineState\Ref PackML\Ref Code\PS_PackML_StateMachine_Auto.TcPOU">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="MachineState\Ref PackML\Ref Code\PS_PackML_StateMachine_Maintenance.TcPOU">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="MachineState\Ref PackML\Ref Code\PS_PackML_StateMachine_Manual.TcPOU">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="MachineState\Ref PackML\Ref Code\PS_PackML_StateMachine_SemiAuto.TcPOU">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="MachineState\Ref PackML\Ref Code\PS_UnitModeManager.TcPOU">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="MachineState\Ref PackML\ST_PMLSubUnitInfo.TcDUT">
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="Version\Global_Version.TcGVL">
       <SubType>Code</SubType>
     </Compile>
   </ItemGroup>
+  <ItemGroup>
+    <None Include="MachineControl.tmc">
+      <SubType>Content</SubType>
+    </None>
+  </ItemGroup>
   <ProjectExtensions>
     <PlcProjectOptions>
       <XmlArchive>
-        <Data>
-          <o xml:space="preserve" t="OptionKey">
+  <Data>
+    <o xml:space="preserve" t="OptionKey">
       <v n="Name">"&lt;ProjectRoot&gt;"</v>
       <d n="SubKeys" t="Hashtable" ckt="String" cvt="OptionKey">
         <v>{192FAD59-8248-4824-A8DE-9177C94C195A}</v>
@@ -175,14 +219,14 @@
       </d>
       <d n="Values" t="Hashtable" />
     </o>
-        </Data>
-        <TypeList>
-          <Type n="Boolean">System.Boolean</Type>
-          <Type n="Hashtable">System.Collections.Hashtable</Type>
-          <Type n="OptionKey">{54dd0eac-a6d8-46f2-8c27-2f43c7e49861}</Type>
-          <Type n="String">System.String</Type>
-        </TypeList>
-      </XmlArchive>
+  </Data>
+  <TypeList>
+    <Type n="Boolean">System.Boolean</Type>
+    <Type n="Hashtable">System.Collections.Hashtable</Type>
+    <Type n="OptionKey">{54dd0eac-a6d8-46f2-8c27-2f43c7e49861}</Type>
+    <Type n="String">System.String</Type>
+  </TypeList>
+</XmlArchive>
     </PlcProjectOptions>
   </ProjectExtensions>
 </Project>

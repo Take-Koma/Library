@@ -1,0 +1,24 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1">
+  <DUT Name="E_PMLCommand" Id="{93d7ca81-887c-49a7-8cef-15582d962263}">
+    <Declaration><![CDATA[{attribute 'qualified_only'}
+{attribute 'strict'}
+{attribute 'to_string'}
+TYPE E_PMLCommand :
+(
+    Undefined   := 0,
+    Reset       := 1,
+    Start       := 2,
+    Stop        := 3,
+    Hold        := 4,
+    Unhold      := 5,
+    Suspend		:= 6,
+    Unsuspend	:= 7,
+    Abort       := 8,
+    Clear       := 9,
+    Complete    := 10
+);
+END_TYPE
+]]></Declaration>
+  </DUT>
+</TcPlcObject>
