@@ -4,11 +4,11 @@
     <Declaration><![CDATA[FUNCTION_BLOCK FB_PackMLUnitModeManager
 VAR_INPUT
 	bExecute 		: BOOL;
-	eModeCommand 	: E_PMLUnitMode;
-	ePMLState		: E_PMLState;
+	eModeCommand 	: E_PackMLUnitMode;
+	ePMLState		: E_PackMLState;
 END_VAR
 VAR_OUTPUT
-	eModeStatus 	: E_PMLUnitMode;
+	eModeStatus 	: E_PackMLUnitMode;
 	Done 			: BOOL;
 	Error 			: BOOL;
 	ErrorID 		: UDINT;
@@ -25,27 +25,15 @@ IF fbTrigger.Q THEN (* rising edge Execute *)
 	ErrorID 	:= 0;
 
      CASE eModeStatus OF
-		E_PMLUnitMode.Invalid:
+		E_PackMLUnitMode.Invalid:
 					eModeStatus := eModeCommand;
 					Done := TRUE;
 
-		E_PMLUnitMode.Production:
-					IF (ePMLState = E_PMLState.STOPPED) OR (ePMLState = E_PMLState.ABORTED) OR (ePMLState = E_PMLState.IDLE) THEN
+		E_PackMLUnitMode.Production:
+					IF (ePMLState = E_PackMLState.Stopped) OR (ePMLState = E_PackMLState.Aborted) OR (ePMLState = E_PackMLState.Idle) THEN
 						eModeStatus := eModeCommand;
 						Done := TRUE;
-					ELSIF (ePMLState = E_PMLState.HELD) AND (eModeCommand = E_PMLUnitMode.MAINTENANCE) THEN
-						eModeStatus := eModeCommand;
-						Done := TRUE;
-					ELSE
-						Error := TRUE;
-						ErrorID := 1;
-					END_IF
-
-		E_PMLUnitMode.Maintenance:
-					IF (ePMLState = E_PMLState.STOPPED) OR (ePMLState = E_PMLState.ABORTED) OR (ePMLState = E_PMLState.IDLE) THEN
-						eModeStatus := eModeCommand;
-						Done := TRUE;
-					ELSIF (ePMLState = E_PMLState.HELD) AND (eModeCommand = E_PMLUnitMode.Production) THEN
+					ELSIF (ePMLState = E_PackMLState.HELD) AND (eModeCommand = E_PackMLUnitMode.MAINTENANCE) THEN
 						eModeStatus := eModeCommand;
 						Done := TRUE;
 					ELSE
@@ -53,8 +41,20 @@ IF fbTrigger.Q THEN (* rising edge Execute *)
 						ErrorID := 1;
 					END_IF
 
-		E_PMLUnitMode.Manual:
-					IF (ePMLState = E_PMLState.STOPPED) OR (ePMLState = E_PMLState.ABORTED) OR (ePMLState = E_PMLState.IDLE) THEN
+		E_PackMLUnitMode.Maintenance:
+					IF (ePMLState = E_PackMLState.Stopped) OR (ePMLState = E_PackMLState.Aborted) OR (ePMLState = E_PackMLState.Idle) THEN
+						eModeStatus := eModeCommand;
+						Done := TRUE;
+					ELSIF (ePMLState = E_PackMLState.HELD) AND (eModeCommand = E_PackMLUnitMode.Production) THEN
+						eModeStatus := eModeCommand;
+						Done := TRUE;
+					ELSE
+						Error := TRUE;
+						ErrorID := 1;
+					END_IF
+
+		E_PackMLUnitMode.Manual:
+					IF (ePMLState = E_PackMLState.Stopped) OR (ePMLState = E_PackMLState.Aborted) OR (ePMLState = E_PackMLState.Idle) THEN
 						eModeStatus := eModeCommand;
 						Done := TRUE;
 					ELSE
@@ -73,7 +73,8 @@ END_IF
  END_IF]]></ST>
     </Implementation>
     <LineIds Name="FB_PackMLUnitModeManager">
-      <LineId Id="1" Count="53" />
+      <LineId Id="55" Count="0" />
+      <LineId Id="2" Count="52" />
     </LineIds>
   </POU>
 </TcPlcObject>

@@ -1,10 +1,10 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <TcPlcObject Version="1.1.0.1">
-  <DUT Name="E_PMLState" Id="{90e76fea-faaf-4fae-9a94-91c7a0248ec9}">
+  <DUT Name="E_PackMLState" Id="{90e76fea-faaf-4fae-9a94-91c7a0248ec9}">
     <Declaration><![CDATA[{attribute 'qualified_only'}
 {attribute 'strict'}
 {attribute 'to_string'}
-TYPE E_PMLState : 
+TYPE E_PackMLState : 
 (
 	Undefined		:= 0,
 	Clearing		:= 1,		//Clearing（異常解除中）		Acting	Abort後の異常解除およびStopped状態への移行中

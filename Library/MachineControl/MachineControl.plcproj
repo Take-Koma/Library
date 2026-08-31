@@ -20,7 +20,7 @@
     <Released>false</Released>
     <Title>Tk_MachineControl</Title>
     <Author>TK</Author>
-    <ProjectVersion>0.0.2.0</ProjectVersion>
+    <ProjectVersion>0.0.3.0</ProjectVersion>
     <GlobalVersionStructureIncluded>true</GlobalVersionStructureIncluded>
     <LibraryCategories>
       <LibraryCategory xmlns="">
@@ -49,7 +49,6 @@
     <Folder Include="MachineState" />
     <Folder Include="MachineState\Original" />
     <Folder Include="MachineState\Ref PackML" />
-    <Folder Include="MachineState\Ref PackML\Ref Code" />
     <Folder Include="Version" />
   </ItemGroup>
   <ItemGroup>
@@ -82,7 +81,7 @@
     <Compile Include="Alarm\FB_AlarmFromTcMessage.TcPOU">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="EventRead\FB_AlarmListener.TcPOU">
+    <Compile Include="EventRead\FB_EventListener.TcPOU">
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="EventRead\ST_EventRead.TcDUT">
@@ -97,34 +96,19 @@
     <Compile Include="MachineState\Original\FB_MachineState.TcPOU">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="MachineState\Ref PackML\E_PMLCommand.TcDUT">
+    <Compile Include="MachineState\Ref PackML\E_PackMLCommand.TcDUT">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="MachineState\Ref PackML\E_PMLState.TcDUT">
+    <Compile Include="MachineState\Ref PackML\E_PackMLState.TcDUT">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="MachineState\Ref PackML\E_PMLUnitMode.TcDUT">
+    <Compile Include="MachineState\Ref PackML\E_PackMLUnitMode.TcDUT">
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="MachineState\Ref PackML\FB_PackMLStateMachine.TcPOU">
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="MachineState\Ref PackML\FB_PackMLUnitModeManager.TcPOU">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="MachineState\Ref PackML\Ref Code\PS_PackML_StateMachine_Auto.TcPOU">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="MachineState\Ref PackML\Ref Code\PS_PackML_StateMachine_Maintenance.TcPOU">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="MachineState\Ref PackML\Ref Code\PS_PackML_StateMachine_Manual.TcPOU">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="MachineState\Ref PackML\Ref Code\PS_PackML_StateMachine_SemiAuto.TcPOU">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="MachineState\Ref PackML\Ref Code\PS_UnitModeManager.TcPOU">
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="MachineState\Ref PackML\ST_PMLSubUnitInfo.TcDUT">
@@ -142,8 +126,8 @@
   <ProjectExtensions>
     <PlcProjectOptions>
       <XmlArchive>
-        <Data>
-          <o xml:space="preserve" t="OptionKey">
+  <Data>
+    <o xml:space="preserve" t="OptionKey">
       <v n="Name">"&lt;ProjectRoot&gt;"</v>
       <d n="SubKeys" t="Hashtable" ckt="String" cvt="OptionKey">
         <v>{192FAD59-8248-4824-A8DE-9177C94C195A}</v>
@@ -219,14 +203,14 @@
       </d>
       <d n="Values" t="Hashtable" />
     </o>
-        </Data>
-        <TypeList>
-          <Type n="Boolean">System.Boolean</Type>
-          <Type n="Hashtable">System.Collections.Hashtable</Type>
-          <Type n="OptionKey">{54dd0eac-a6d8-46f2-8c27-2f43c7e49861}</Type>
-          <Type n="String">System.String</Type>
-        </TypeList>
-      </XmlArchive>
+  </Data>
+  <TypeList>
+    <Type n="Boolean">System.Boolean</Type>
+    <Type n="Hashtable">System.Collections.Hashtable</Type>
+    <Type n="OptionKey">{54dd0eac-a6d8-46f2-8c27-2f43c7e49861}</Type>
+    <Type n="String">System.String</Type>
+  </TypeList>
+</XmlArchive>
     </PlcProjectOptions>
   </ProjectExtensions>
 </Project>

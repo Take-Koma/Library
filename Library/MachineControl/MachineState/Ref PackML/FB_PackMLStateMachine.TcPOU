@@ -3,25 +3,25 @@
   <POU Name="FB_PackMLStateMachine" Id="{cf7e90d4-3aad-4ab5-82e1-f33dada3ea03}" SpecialFunc="None">
     <Declaration><![CDATA[FUNCTION_BLOCK FB_PackMLStateMachine
 VAR_INPUT
-	eUnitMode 			: E_PMLUnitMode;
-	eCommand			: E_PMLCommand;
+	eUnitMode 			: E_PackMLUnitMode;
+	eCommand			: E_PackMLCommand;
 END_VAR
 VAR_IN_OUT
 	stSubUnitInfo		: ARRAY[*] OF ST_PMLSubUnitInfo; 
 END_VAR
 VAR_OUTPUT
-	eState				: E_PMLState := E_PMLState.IDLE;
+	eState				: E_PackMLState := E_PackMLState.Idle;
 	Error 				: BOOL;
 	ErrorID 			: UDINT;
 END_VAR
 VAR
-	eCommandPrev		: E_PMLCommand;
+	eCommandPrev		: E_PackMLCommand;
 	bCommandRise		: BOOL;
 END_VAR
 ]]></Declaration>
     <Implementation>
       <ST><![CDATA[// コマンドの立ち上がり検出 (前回スキャンから変更があった場合のみ受付)
-bCommandRise := (eCommand <> E_PMLCommand.Undefined) AND (eCommand <> eCommandPrev);
+bCommandRise := (eCommand <> E_PackMLCommand.Undefined) AND (eCommand <> eCommandPrev);
 eCommandPrev := eCommand;
 
 //ステートチェンジ判定
@@ -30,13 +30,13 @@ ErrorID := 0;
 
 CASE eUnitMode OF
 	
-	E_PMLUnitMode.Production:
+	E_PackMLUnitMode.Production:
 		StateMachine_Production();
 		
-	E_PMLUnitMode.Maintenance:
+	E_PackMLUnitMode.Maintenance:
 		StateMachine_Maintenance();
 		
-	E_PMLUnitMode.Manual:
+	E_PackMLUnitMode.Manual:
 		StateMachine_Manual();
 		
 END_CASE
@@ -48,136 +48,136 @@ END_CASE
 ]]></Declaration>
       <Implementation>
         <ST><![CDATA[CASE eState OF
-	E_PMLState.Undefined:
+	E_PackMLState.Undefined:
 		
-		IF eCommand=E_PMLCommand.Abort THEN
-			eState	:= E_PMLState.ABORTING;
-		ELSIF eCommand=E_PMLCommand.Stop THEN
-			eState	:= E_PMLState.STOPPING;
+		IF eCommand=E_PackMLCommand.Abort THEN
+			eState	:= E_PackMLState.Aborting;
+		ELSIF eCommand=E_PackMLCommand.Stop THEN
+			eState	:= E_PackMLState.Stopping;
 		ELSIF bCommandRise THEN
 			Error 	:= TRUE;
 			ErrorID	:= 1;
 		END_IF
 
-	E_PMLState.IDLE:
+	E_PackMLState.Idle:
 		
-		IF eCommand=E_PMLCommand.Abort THEN
-			eState	:= E_PMLState.ABORTING;
-		ELSIF eCommand=E_PMLCommand.Stop THEN
-			eState	:= E_PMLState.STOPPING;
-		ELSIF eCommand=E_PMLCommand.Start THEN
-			eState	:= E_PMLState.Starting;
+		IF eCommand=E_PackMLCommand.Abort THEN
+			eState	:= E_PackMLState.Aborting;
+		ELSIF eCommand=E_PackMLCommand.Stop THEN
+			eState	:= E_PackMLState.Stopping;
+		ELSIF eCommand=E_PackMLCommand.Start THEN
+			eState	:= E_PackMLState.Starting;
 		ELSIF bCommandRise THEN
 			Error 	:= TRUE;
 			ErrorID	:= 1;
 		END_IF
 
-	E_PMLState.STARTING:
+	E_PackMLState.Starting:
 
-		IF eCommand=E_PMLCommand.Abort THEN
-			eState	:= E_PMLState.ABORTING;
-		ELSIF eCommand=E_PMLCommand.Stop THEN
-			eState	:= E_PMLState.STOPPING;
-		ELSIF SubUnitStateComplete(eTarget:=E_PMLState.EXECUTE) THEN
-			eState	:= E_PMLState.EXECUTE;
+		IF eCommand=E_PackMLCommand.Abort THEN
+			eState	:= E_PackMLState.Aborting;
+		ELSIF eCommand=E_PackMLCommand.Stop THEN
+			eState	:= E_PackMLState.Stopping;
+		ELSIF SubUnitStateComplete(eTarget:=E_PackMLState.Execute) THEN
+			eState	:= E_PackMLState.Execute;
 		END_IF
 
-	E_PMLState.EXECUTE:
+	E_PackMLState.Execute:
 		
-		IF eCommand=E_PMLCommand.Abort THEN
-			eState	:= E_PMLState.ABORTING;
-		ELSIF eCommand=E_PMLCommand.Stop THEN
-			eState	:= E_PMLState.STOPPING;
-		ELSIF eCOmmand=E_PMLCommand.Hold THEN
-			eState	:= E_PMLState.Holding;
+		IF eCommand=E_PackMLCommand.Abort THEN
+			eState	:= E_PackMLState.Aborting;
+		ELSIF eCommand=E_PackMLCommand.Stop THEN
+			eState	:= E_PackMLState.Stopping;
+		ELSIF eCommand=E_PackMLCommand.Hold THEN
+			eState	:= E_PackMLState.Holding;
 		ELSIF bCommandRise THEN
 			Error 	:= TRUE;
 			ErrorID	:= 1;
 		END_IF
 
-	E_PMLState.RESETTING:
+	E_PackMLState.Resetting:
 
-		IF eCommand=E_PMLCommand.Abort THEN
-			eState	:= E_PMLState.ABORTING;
-		ELSIF eCommand=E_PMLCommand.Stop THEN
-			eState	:= E_PMLState.STOPPING;
-		ELSIF SubUnitStateComplete(eTarget:=E_PMLState.IDLE) THEN
-			eState	:= E_PMLState.IDLE;
+		IF eCommand=E_PackMLCommand.Abort THEN
+			eState	:= E_PackMLState.Aborting;
+		ELSIF eCommand=E_PackMLCommand.Stop THEN
+			eState	:= E_PackMLState.Stopping;
+		ELSIF SubUnitStateComplete(eTarget:=E_PackMLState.Idle) THEN
+			eState	:= E_PackMLState.Idle;
 		END_IF
 	
-	E_PMLState.Holding:
+	E_PackMLState.Holding:
 		
-		IF eCommand=E_PMLCommand.Abort THEN
-			eState	:= E_PMLState.ABORTING;
-		ELSIF eCommand=E_PMLCommand.Stop THEN
-			eState	:= E_PMLState.STOPPING;
-		ELSIF SubUnitStateComplete(eTarget:=E_PMLState.Held) THEN
-			eState	:= E_PMLState.Held;
+		IF eCommand=E_PackMLCommand.Abort THEN
+			eState	:= E_PackMLState.Aborting;
+		ELSIF eCommand=E_PackMLCommand.Stop THEN
+			eState	:= E_PackMLState.Stopping;
+		ELSIF SubUnitStateComplete(eTarget:=E_PackMLState.Held) THEN
+			eState	:= E_PackMLState.Held;
 		END_IF
 
-	E_PMLState.Held:
+	E_PackMLState.Held:
 	
-		IF eCommand=E_PMLCommand.Abort THEN
-			eState	:= E_PMLState.ABORTING;
-		ELSIF eCommand=E_PMLCommand.Stop THEN
-			eState	:= E_PMLState.STOPPING;
-		ELSIF eCOmmand=E_PMLCommand.Unhold THEN
-			eState	:= E_PMLState.Unholding;
+		IF eCommand=E_PackMLCommand.Abort THEN
+			eState	:= E_PackMLState.Aborting;
+		ELSIF eCommand=E_PackMLCommand.Stop THEN
+			eState	:= E_PackMLState.Stopping;
+		ELSIF eCommand=E_PackMLCommand.Unhold THEN
+			eState	:= E_PackMLState.Unholding;
 		ELSIF bCommandRise THEN
 			Error 	:= TRUE;
 			ErrorID	:= 1;
 		END_IF
 
-	E_PMLState.Unholding:
+	E_PackMLState.Unholding:
 	
-		IF eCommand=E_PMLCommand.Abort THEN
-			eState	:= E_PMLState.ABORTING;
-		ELSIF eCommand=E_PMLCommand.Stop THEN
-			eState	:= E_PMLState.STOPPING;
-		ELSIF SubUnitStateComplete(eTarget:=E_PMLState.EXECUTE) THEN
-			eState	:= E_PMLState.EXECUTE;
+		IF eCommand=E_PackMLCommand.Abort THEN
+			eState	:= E_PackMLState.Aborting;
+		ELSIF eCommand=E_PackMLCommand.Stop THEN
+			eState	:= E_PackMLState.Stopping;
+		ELSIF SubUnitStateComplete(eTarget:=E_PackMLState.Execute) THEN
+			eState	:= E_PackMLState.Execute;
 		END_IF
 
-	E_PMLState.STOPPING:
+	E_PackMLState.Stopping:
 
-		IF eCommand=E_PMLCommand.Abort THEN
-			eState	:= E_PMLState.ABORTING;
-		ELSIF SubUnitStateComplete(eTarget:=E_PMLState.STOPPED) THEN
-			eState	:= E_PMLState.STOPPED;
+		IF eCommand=E_PackMLCommand.Abort THEN
+			eState	:= E_PackMLState.Aborting;
+		ELSIF SubUnitStateComplete(eTarget:=E_PackMLState.Stopped) THEN
+			eState	:= E_PackMLState.Stopped;
 		END_IF
 
-	E_PMLState.STOPPED:
+	E_PackMLState.Stopped:
 
-		IF eCommand=E_PMLCommand.Abort THEN
-			eState	:= E_PMLState.ABORTING;
-		ELSIF eCommand=E_PMLCommand.Reset THEN
-			eState	:= E_PMLState.Resetting;
+		IF eCommand=E_PackMLCommand.Abort THEN
+			eState	:= E_PackMLState.Aborting;
+		ELSIF eCommand=E_PackMLCommand.Reset THEN
+			eState	:= E_PackMLState.Resetting;
 		ELSIF bCommandRise THEN
 			Error 	:= TRUE;
 			ErrorID	:= 1;
 		END_IF
 
-	E_PMLState.ABORTING:
+	E_PackMLState.Aborting:
 
-		IF SubUnitStateComplete(eTarget:=E_PMLState.Aborted) THEN
-			eState	:= E_PMLState.Aborted;
+		IF SubUnitStateComplete(eTarget:=E_PackMLState.Aborted) THEN
+			eState	:= E_PackMLState.Aborted;
 		END_IF
 
-	E_PMLState.ABORTED:
+	E_PackMLState.Aborted:
 
-		IF eCommand=E_PMLCommand.Clear THEN
-			eState	:= E_PMLState.Clearing;
+		IF eCommand=E_PackMLCommand.Clear THEN
+			eState	:= E_PackMLState.Clearing;
 		ELSIF bCommandRise THEN
 			Error 	:= TRUE;
 			ErrorID	:= 1;
 		END_IF
 
-	E_PMLState.CLEARING:
+	E_PackMLState.Clearing:
 
-		IF eCommand=E_PMLCommand.Abort THEN
-			eState	:= E_PMLState.ABORTING;
-		ELSIF SubUnitStateComplete(eTarget:=E_PMLState.STOPPED) THEN
-			eState	:= E_PMLState.STOPPED;
+		IF eCommand=E_PackMLCommand.Abort THEN
+			eState	:= E_PackMLState.Aborting;
+		ELSIF SubUnitStateComplete(eTarget:=E_PackMLState.Stopped) THEN
+			eState	:= E_PackMLState.Stopped;
 		END_IF
 
 END_CASE
@@ -189,102 +189,102 @@ END_CASE
 ]]></Declaration>
       <Implementation>
         <ST><![CDATA[CASE eState OF
-	E_PMLState.Undefined:
+	E_PackMLState.Undefined:
 		
-		IF eCommand=E_PMLCommand.Abort THEN
-			eState	:= E_PMLState.ABORTING;
-		ELSIF eCommand=E_PMLCommand.Stop THEN
-			eState	:= E_PMLState.STOPPING;
+		IF eCommand=E_PackMLCommand.Abort THEN
+			eState	:= E_PackMLState.Aborting;
+		ELSIF eCommand=E_PackMLCommand.Stop THEN
+			eState	:= E_PackMLState.Stopping;
 		ELSIF bCommandRise THEN
 			Error 	:= TRUE;
 			ErrorID	:= 1;
 		END_IF
 
-	E_PMLState.IDLE:
+	E_PackMLState.Idle:
 		
-		IF eCommand=E_PMLCommand.Abort THEN
-			eState	:= E_PMLState.ABORTING;
-		ELSIF eCommand=E_PMLCommand.Stop THEN
-			eState	:= E_PMLState.STOPPING;
-		ELSIF eCommand=E_PMLCommand.Start THEN
-			eState	:= E_PMLState.Starting;
+		IF eCommand=E_PackMLCommand.Abort THEN
+			eState	:= E_PackMLState.Aborting;
+		ELSIF eCommand=E_PackMLCommand.Stop THEN
+			eState	:= E_PackMLState.Stopping;
+		ELSIF eCommand=E_PackMLCommand.Start THEN
+			eState	:= E_PackMLState.Starting;
 		ELSIF bCommandRise THEN
 			Error 	:= TRUE;
 			ErrorID	:= 1;
 		END_IF
 
-	E_PMLState.STARTING:
+	E_PackMLState.Starting:
 
-		IF eCommand=E_PMLCommand.Abort THEN
-			eState	:= E_PMLState.ABORTING;
-		ELSIF eCommand=E_PMLCommand.Stop THEN
-			eState	:= E_PMLState.STOPPING;
-		ELSIF SubUnitStateComplete(eTarget:=E_PMLState.EXECUTE) THEN
-			eState	:= E_PMLState.EXECUTE;
+		IF eCommand=E_PackMLCommand.Abort THEN
+			eState	:= E_PackMLState.Aborting;
+		ELSIF eCommand=E_PackMLCommand.Stop THEN
+			eState	:= E_PackMLState.Stopping;
+		ELSIF SubUnitStateComplete(eTarget:=E_PackMLState.Execute) THEN
+			eState	:= E_PackMLState.Execute;
 		END_IF
 
-	E_PMLState.EXECUTE:
+	E_PackMLState.Execute:
 		
-		IF eCommand=E_PMLCommand.Abort THEN
-			eState	:= E_PMLState.ABORTING;
-		ELSIF eCommand=E_PMLCommand.Stop THEN
-			eState	:= E_PMLState.STOPPING;
+		IF eCommand=E_PackMLCommand.Abort THEN
+			eState	:= E_PackMLState.Aborting;
+		ELSIF eCommand=E_PackMLCommand.Stop THEN
+			eState	:= E_PackMLState.Stopping;
 		ELSIF bCommandRise THEN
 			Error 	:= TRUE;
 			ErrorID	:= 1;
 		END_IF
 
 
-	E_PMLState.RESETTING:
+	E_PackMLState.Resetting:
 
-		IF eCommand=E_PMLCommand.Abort THEN
-			eState	:= E_PMLState.ABORTING;
-		ELSIF eCommand=E_PMLCommand.Stop THEN
-			eState	:= E_PMLState.STOPPING;
-		ELSIF SubUnitStateComplete(eTarget:=E_PMLState.IDLE) THEN
-			eState	:= E_PMLState.IDLE;
+		IF eCommand=E_PackMLCommand.Abort THEN
+			eState	:= E_PackMLState.Aborting;
+		ELSIF eCommand=E_PackMLCommand.Stop THEN
+			eState	:= E_PackMLState.Stopping;
+		ELSIF SubUnitStateComplete(eTarget:=E_PackMLState.Idle) THEN
+			eState	:= E_PackMLState.Idle;
 		END_IF
 
-	E_PMLState.STOPPING:
+	E_PackMLState.Stopping:
 
-		IF eCommand=E_PMLCommand.Abort THEN
-			eState	:= E_PMLState.ABORTING;
-		ELSIF SubUnitStateComplete(eTarget:=E_PMLState.STOPPED) THEN
-			eState	:= E_PMLState.STOPPED;
+		IF eCommand=E_PackMLCommand.Abort THEN
+			eState	:= E_PackMLState.Aborting;
+		ELSIF SubUnitStateComplete(eTarget:=E_PackMLState.Stopped) THEN
+			eState	:= E_PackMLState.Stopped;
 		END_IF
 
-	E_PMLState.STOPPED:
+	E_PackMLState.Stopped:
 
-		IF eCommand=E_PMLCommand.Abort THEN
-			eState	:= E_PMLState.ABORTING;
-		ELSIF eCommand=E_PMLCommand.Reset THEN
-			eState	:= E_PMLState.Resetting;
+		IF eCommand=E_PackMLCommand.Abort THEN
+			eState	:= E_PackMLState.Aborting;
+		ELSIF eCommand=E_PackMLCommand.Reset THEN
+			eState	:= E_PackMLState.Resetting;
 		ELSIF bCommandRise THEN
 			Error 	:= TRUE;
 			ErrorID	:= 1;
 		END_IF
 
-	E_PMLState.ABORTING:
+	E_PackMLState.Aborting:
 
-		IF SubUnitStateComplete(eTarget:=E_PMLState.Aborted) THEN
-			eState	:= E_PMLState.Aborted;
+		IF SubUnitStateComplete(eTarget:=E_PackMLState.Aborted) THEN
+			eState	:= E_PackMLState.Aborted;
 		END_IF
 
-	E_PMLState.ABORTED:
+	E_PackMLState.Aborted:
 
-		IF eCommand=E_PMLCommand.Clear THEN
-			eState	:= E_PMLState.Clearing;
+		IF eCommand=E_PackMLCommand.Clear THEN
+			eState	:= E_PackMLState.Clearing;
 		ELSIF bCommandRise THEN
 			Error 	:= TRUE;
 			ErrorID	:= 1;
 		END_IF
 
-	E_PMLState.CLEARING:
+	E_PackMLState.Clearing:
 
-		IF eCommand=E_PMLCommand.Abort THEN
-			eState	:= E_PMLState.ABORTING;
-		ELSIF SubUnitStateComplete(eTarget:=E_PMLState.STOPPED) THEN
-			eState	:= E_PMLState.STOPPED;
+		IF eCommand=E_PackMLCommand.Abort THEN
+			eState	:= E_PackMLState.Aborting;
+		ELSIF SubUnitStateComplete(eTarget:=E_PackMLState.Stopped) THEN
+			eState	:= E_PackMLState.Stopped;
 		END_IF
 
 END_CASE
@@ -296,196 +296,196 @@ END_CASE
 ]]></Declaration>
       <Implementation>
         <ST><![CDATA[CASE eState OF
-	E_PMLState.Undefined:
+	E_PackMLState.Undefined:
 		
-		IF eCommand=E_PMLCommand.Abort THEN
-			eState	:= E_PMLState.ABORTING;
-		ELSIF eCommand=E_PMLCommand.Stop THEN
-			eState	:= E_PMLState.STOPPING;
+		IF eCommand=E_PackMLCommand.Abort THEN
+			eState	:= E_PackMLState.Aborting;
+		ELSIF eCommand=E_PackMLCommand.Stop THEN
+			eState	:= E_PackMLState.Stopping;
 		ELSIF bCommandRise THEN
 			Error 	:= TRUE;
 			ErrorID	:= 1;
 		END_IF
 
-	E_PMLState.IDLE:
+	E_PackMLState.Idle:
 		
-		IF eCommand=E_PMLCommand.Abort THEN
-			eState	:= E_PMLState.ABORTING;
-		ELSIF eCommand=E_PMLCommand.Stop THEN
-			eState	:= E_PMLState.STOPPING;
-		ELSIF eCommand=E_PMLCommand.Start THEN
-			eState	:= E_PMLState.Starting;
+		IF eCommand=E_PackMLCommand.Abort THEN
+			eState	:= E_PackMLState.Aborting;
+		ELSIF eCommand=E_PackMLCommand.Stop THEN
+			eState	:= E_PackMLState.Stopping;
+		ELSIF eCommand=E_PackMLCommand.Start THEN
+			eState	:= E_PackMLState.Starting;
 		ELSIF bCommandRise THEN
 			Error 	:= TRUE;
 			ErrorID	:= 1;
 		END_IF
 
-	E_PMLState.STARTING:
+	E_PackMLState.Starting:
 
-		IF eCommand=E_PMLCommand.Abort THEN
-			eState	:= E_PMLState.ABORTING;
-		ELSIF eCommand=E_PMLCommand.Stop THEN
-			eState	:= E_PMLState.STOPPING;
-		ELSIF SubUnitStateComplete(eTarget:=E_PMLState.EXECUTE) THEN
-			eState	:= E_PMLState.EXECUTE;
+		IF eCommand=E_PackMLCommand.Abort THEN
+			eState	:= E_PackMLState.Aborting;
+		ELSIF eCommand=E_PackMLCommand.Stop THEN
+			eState	:= E_PackMLState.Stopping;
+		ELSIF SubUnitStateComplete(eTarget:=E_PackMLState.Execute) THEN
+			eState	:= E_PackMLState.Execute;
 		END_IF
 
-	E_PMLState.EXECUTE:
+	E_PackMLState.Execute:
 		
-		IF eCommand=E_PMLCommand.Abort THEN
-			eState	:= E_PMLState.ABORTING;
-		ELSIF eCommand=E_PMLCommand.Stop THEN
-			eState	:= E_PMLState.STOPPING;
-		ELSIF eCommand=E_PMLCommand.Suspend THEN
-			eState	:= E_PMLState.Suspending;
-		ELSIF eCOmmand=E_PMLCommand.Hold THEN
-			eState	:= E_PMLState.Holding;
-		ELSIF eCOmmand=E_PMLCommand.Complete THEN
-			eState	:= E_PMLState.Completing;		
+		IF eCommand=E_PackMLCommand.Abort THEN
+			eState	:= E_PackMLState.Aborting;
+		ELSIF eCommand=E_PackMLCommand.Stop THEN
+			eState	:= E_PackMLState.Stopping;
+		ELSIF eCommand=E_PackMLCommand.Suspend THEN
+			eState	:= E_PackMLState.Suspending;
+		ELSIF eCommand=E_PackMLCommand.Hold THEN
+			eState	:= E_PackMLState.Holding;
+		ELSIF eCommand=E_PackMLCommand.Complete THEN
+			eState	:= E_PackMLState.Completing;		
 		ELSIF bCommandRise THEN
 			Error 	:= TRUE;
 			ErrorID	:= 1;
 		END_IF
 
-	E_PMLState.Completing:
+	E_PackMLState.Completing:
 	
-		IF eCommand=E_PMLCommand.Abort THEN
-			eState	:= E_PMLState.ABORTING;
-		ELSIF eCommand=E_PMLCommand.Stop THEN
-			eState	:= E_PMLState.STOPPING;
-		ELSIF SubUnitStateComplete(eTarget:=E_PMLState.Completed) THEN
-			eState	:= E_PMLState.Completed;
+		IF eCommand=E_PackMLCommand.Abort THEN
+			eState	:= E_PackMLState.Aborting;
+		ELSIF eCommand=E_PackMLCommand.Stop THEN
+			eState	:= E_PackMLState.Stopping;
+		ELSIF SubUnitStateComplete(eTarget:=E_PackMLState.Completed) THEN
+			eState	:= E_PackMLState.Completed;
 		END_IF
 
-	E_PMLState.Completed:
+	E_PackMLState.Completed:
 		
-		IF eCommand=E_PMLCommand.Abort THEN
-			eState	:= E_PMLState.ABORTING;
-		ELSIF eCommand=E_PMLCommand.Stop THEN
-			eState	:= E_PMLState.STOPPING;
-		ELSIF eCommand=E_PMLCommand.Reset THEN
-			eState	:= E_PMLState.Resetting;
+		IF eCommand=E_PackMLCommand.Abort THEN
+			eState	:= E_PackMLState.Aborting;
+		ELSIF eCommand=E_PackMLCommand.Stop THEN
+			eState	:= E_PackMLState.Stopping;
+		ELSIF eCommand=E_PackMLCommand.Reset THEN
+			eState	:= E_PackMLState.Resetting;
 		ELSIF bCommandRise THEN
 			Error 	:= TRUE;
 			ErrorID	:= 1;
 		END_IF
 
-	E_PMLState.RESETTING:
+	E_PackMLState.Resetting:
 
-		IF eCommand=E_PMLCommand.Abort THEN
-			eState	:= E_PMLState.ABORTING;
-		ELSIF eCommand=E_PMLCommand.Stop THEN
-			eState	:= E_PMLState.STOPPING;
-		ELSIF SubUnitStateComplete(eTarget:=E_PMLState.IDLE) THEN
-			eState	:= E_PMLState.IDLE;
+		IF eCommand=E_PackMLCommand.Abort THEN
+			eState	:= E_PackMLState.Aborting;
+		ELSIF eCommand=E_PackMLCommand.Stop THEN
+			eState	:= E_PackMLState.Stopping;
+		ELSIF SubUnitStateComplete(eTarget:=E_PackMLState.Idle) THEN
+			eState	:= E_PackMLState.Idle;
 		END_IF
 
-	E_PMLState.Holding:
+	E_PackMLState.Holding:
 		
-		IF eCommand=E_PMLCommand.Abort THEN
-			eState	:= E_PMLState.ABORTING;
-		ELSIF eCommand=E_PMLCommand.Stop THEN
-			eState	:= E_PMLState.STOPPING;
-		ELSIF SubUnitStateComplete(eTarget:=E_PMLState.Held) THEN
-			eState	:= E_PMLState.Held;
+		IF eCommand=E_PackMLCommand.Abort THEN
+			eState	:= E_PackMLState.Aborting;
+		ELSIF eCommand=E_PackMLCommand.Stop THEN
+			eState	:= E_PackMLState.Stopping;
+		ELSIF SubUnitStateComplete(eTarget:=E_PackMLState.Held) THEN
+			eState	:= E_PackMLState.Held;
 		END_IF
 
-	E_PMLState.Held:
+	E_PackMLState.Held:
 	
-		IF eCommand=E_PMLCommand.Abort THEN
-			eState	:= E_PMLState.ABORTING;
-		ELSIF eCommand=E_PMLCommand.Stop THEN
-			eState	:= E_PMLState.STOPPING;
-		ELSIF eCOmmand=E_PMLCommand.Unhold THEN
-			eState	:= E_PMLState.Unholding;
+		IF eCommand=E_PackMLCommand.Abort THEN
+			eState	:= E_PackMLState.Aborting;
+		ELSIF eCommand=E_PackMLCommand.Stop THEN
+			eState	:= E_PackMLState.Stopping;
+		ELSIF eCommand=E_PackMLCommand.Unhold THEN
+			eState	:= E_PackMLState.Unholding;
 		ELSIF bCommandRise THEN
 			Error 	:= TRUE;
 			ErrorID	:= 1;
 		END_IF
 
-	E_PMLState.Unholding:
+	E_PackMLState.Unholding:
 	
-		IF eCommand=E_PMLCommand.Abort THEN
-			eState	:= E_PMLState.ABORTING;
-		ELSIF eCommand=E_PMLCommand.Stop THEN
-			eState	:= E_PMLState.STOPPING;
-		ELSIF SubUnitStateComplete(eTarget:=E_PMLState.EXECUTE) THEN
-			eState	:= E_PMLState.EXECUTE;
+		IF eCommand=E_PackMLCommand.Abort THEN
+			eState	:= E_PackMLState.Aborting;
+		ELSIF eCommand=E_PackMLCommand.Stop THEN
+			eState	:= E_PackMLState.Stopping;
+		ELSIF SubUnitStateComplete(eTarget:=E_PackMLState.Execute) THEN
+			eState	:= E_PackMLState.Execute;
 		END_IF
 
-	E_PMLState.Suspending:
+	E_PackMLState.Suspending:
 	
-		IF eCommand=E_PMLCommand.Abort THEN
-			eState	:= E_PMLState.ABORTING;
-		ELSIF eCommand=E_PMLCommand.Stop THEN
-			eState	:= E_PMLState.STOPPING;
-		ELSIF SubUnitStateComplete(eTarget:=E_PMLState.Suspended) THEN
-			eState	:= E_PMLState.Suspended;
+		IF eCommand=E_PackMLCommand.Abort THEN
+			eState	:= E_PackMLState.Aborting;
+		ELSIF eCommand=E_PackMLCommand.Stop THEN
+			eState	:= E_PackMLState.Stopping;
+		ELSIF SubUnitStateComplete(eTarget:=E_PackMLState.Suspended) THEN
+			eState	:= E_PackMLState.Suspended;
 		END_IF
 
-	E_PMLState.Suspended:
+	E_PackMLState.Suspended:
 	
-		IF eCommand=E_PMLCommand.Abort THEN
-			eState	:= E_PMLState.ABORTING;
-		ELSIF eCommand=E_PMLCommand.Stop THEN
-			eState	:= E_PMLState.STOPPING;
-		ELSIF eCOmmand=E_PMLCommand.Unsuspend THEN
-			eState	:= E_PMLState.Unsuspending;
+		IF eCommand=E_PackMLCommand.Abort THEN
+			eState	:= E_PackMLState.Aborting;
+		ELSIF eCommand=E_PackMLCommand.Stop THEN
+			eState	:= E_PackMLState.Stopping;
+		ELSIF eCommand=E_PackMLCommand.Unsuspend THEN
+			eState	:= E_PackMLState.Unsuspending;
 		ELSIF bCommandRise THEN
 			Error 	:= TRUE;
 			ErrorID	:= 1;
 		END_IF
 	
-	E_PMLState.Unsuspending:
+	E_PackMLState.Unsuspending:
 	
-		IF eCommand=E_PMLCommand.Abort THEN
-			eState	:= E_PMLState.ABORTING;
-		ELSIF eCommand=E_PMLCommand.Stop THEN
-			eState	:= E_PMLState.STOPPING;
-		ELSIF SubUnitStateComplete(eTarget:=E_PMLState.EXECUTE) THEN
-			eState	:= E_PMLState.EXECUTE;
+		IF eCommand=E_PackMLCommand.Abort THEN
+			eState	:= E_PackMLState.Aborting;
+		ELSIF eCommand=E_PackMLCommand.Stop THEN
+			eState	:= E_PackMLState.Stopping;
+		ELSIF SubUnitStateComplete(eTarget:=E_PackMLState.Execute) THEN
+			eState	:= E_PackMLState.Execute;
 		END_IF
 
-	E_PMLState.STOPPING:
+	E_PackMLState.Stopping:
 
-		IF eCommand=E_PMLCommand.Abort THEN
-			eState	:= E_PMLState.ABORTING;
-		ELSIF SubUnitStateComplete(eTarget:=E_PMLState.STOPPED) THEN
-			eState	:= E_PMLState.STOPPED;
+		IF eCommand=E_PackMLCommand.Abort THEN
+			eState	:= E_PackMLState.Aborting;
+		ELSIF SubUnitStateComplete(eTarget:=E_PackMLState.Stopped) THEN
+			eState	:= E_PackMLState.Stopped;
 		END_IF
 
-	E_PMLState.STOPPED:
+	E_PackMLState.Stopped:
 
-		IF eCommand=E_PMLCommand.Abort THEN
-			eState	:= E_PMLState.ABORTING;
-		ELSIF eCommand=E_PMLCommand.Reset THEN
-			eState	:= E_PMLState.Resetting;
+		IF eCommand=E_PackMLCommand.Abort THEN
+			eState	:= E_PackMLState.Aborting;
+		ELSIF eCommand=E_PackMLCommand.Reset THEN
+			eState	:= E_PackMLState.Resetting;
 		ELSIF bCommandRise THEN
 			Error 	:= TRUE;
 			ErrorID	:= 1;
 		END_IF
 
-	E_PMLState.ABORTING:
+	E_PackMLState.Aborting:
 
-		IF SubUnitStateComplete(eTarget:=E_PMLState.Aborted) THEN
-			eState	:= E_PMLState.Aborted;
+		IF SubUnitStateComplete(eTarget:=E_PackMLState.Aborted) THEN
+			eState	:= E_PackMLState.Aborted;
 		END_IF
 
-	E_PMLState.ABORTED:
+	E_PackMLState.Aborted:
 
-		IF eCommand=E_PMLCommand.Clear THEN
-			eState	:= E_PMLState.Clearing;
+		IF eCommand=E_PackMLCommand.Clear THEN
+			eState	:= E_PackMLState.Clearing;
 		ELSIF bCommandRise THEN
 			Error 	:= TRUE;
 			ErrorID	:= 1;
 		END_IF
 
-	E_PMLState.CLEARING:
+	E_PackMLState.Clearing:
 
-		IF eCommand=E_PMLCommand.Abort THEN
-			eState	:= E_PMLState.ABORTING;
-		ELSIF SubUnitStateComplete(eTarget:=E_PMLState.STOPPED) THEN
-			eState	:= E_PMLState.STOPPED;
+		IF eCommand=E_PackMLCommand.Abort THEN
+			eState	:= E_PackMLState.Aborting;
+		ELSIF SubUnitStateComplete(eTarget:=E_PackMLState.Stopped) THEN
+			eState	:= E_PackMLState.Stopped;
 		END_IF
 
 END_CASE
@@ -495,7 +495,7 @@ END_CASE
     <Method Name="SubUnitStateComplete" Id="{ffee066b-ec87-4feb-94d3-ea6f9f189795}">
       <Declaration><![CDATA[METHOD SubUnitStateComplete :BOOL
 VAR_INPUT
-    eTarget	: E_PMLState;
+    eTarget	: E_PackMLState;
 END_VAR
 VAR
 	i					: DINT;	
@@ -513,21 +513,19 @@ SubUnitStateComplete := TRUE;]]></ST>
       </Implementation>
     </Method>
     <LineIds Name="FB_PackMLStateMachine">
-      <LineId Id="42" Count="1" />
-      <LineId Id="2" Count="0" />
-      <LineId Id="21" Count="5" />
-      <LineId Id="41" Count="0" />
-      <LineId Id="27" Count="11" />
+      <LineId Id="44" Count="20" />
+      <LineId Id="38" Count="0" />
     </LineIds>
     <LineIds Name="FB_PackMLStateMachine.StateMachine_Maintenance">
-      <LineId Id="136" Count="133" />
+      <LineId Id="270" Count="133" />
       <LineId Id="135" Count="0" />
     </LineIds>
     <LineIds Name="FB_PackMLStateMachine.StateMachine_Manual">
       <LineId Id="1" Count="100" />
     </LineIds>
     <LineIds Name="FB_PackMLStateMachine.StateMachine_Production">
-      <LineId Id="1" Count="194" />
+      <LineId Id="196" Count="193" />
+      <LineId Id="195" Count="0" />
     </LineIds>
     <LineIds Name="FB_PackMLStateMachine.SubUnitStateComplete">
       <LineId Id="1" Count="7" />

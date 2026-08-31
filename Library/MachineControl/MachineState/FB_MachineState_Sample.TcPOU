@@ -16,12 +16,12 @@ VAR_INPUT
     bAbortDone              : BOOL; // 安全遮断完了
 
     // モード切替要求
-    eRequestedUnitMode      : E_PMLUnitMode := E_PMLUnitMode.Production;
+    eRequestedUnitMode      : E_PackMLUnitMode := E_PackMLUnitMode.Production;
 END_VAR
 
 VAR_OUTPUT
-    eMachineState           : E_PMLState := E_PMLState.Stopped;
-    eUnitMode               : E_PMLUnitMode := E_PMLUnitMode.Production;
+    eMachineState           : E_PackMLState := E_PackMLState.Stopped;
+    eUnitMode               : E_PackMLUnitMode := E_PackMLUnitMode.Production;
     bStopMachine            : BOOL; // 全軸停止・動作禁止指示
     bAllowManual            : BOOL; // 手動操作許可フラグ
 END_VAR
@@ -43,24 +43,24 @@ SUPER^.Execute();
 //--- 2. EventLoggerアラームによる最優先ステート遷移（割り込み） ---
 // Critical発生 -> Aborting へ強制遷移
 IF (bCritical OR liCriticalActiveCount > 0) AND 
-   (eMachineState <> E_PMLState.Aborting AND eMachineState <> E_PMLState.Aborted) THEN
-    eMachineState := E_PMLState.Aborting;
+   (eMachineState <> E_PackMLState.Aborting AND eMachineState <> E_PackMLState.Aborted) THEN
+    eMachineState := E_PackMLState.Aborting;
 
 // Error発生 -> Stopping へ強制遷移
 ELSIF (bError OR liErrorActiveCount > 0) AND 
-      (eMachineState <> E_PMLState.Stopping AND eMachineState <> E_PMLState.Stopped AND 
-       eMachineState <> E_PMLState.Aborting AND eMachineState <> E_PMLState.Aborted) THEN
-    eMachineState := E_PMLState.Stopping;
+      (eMachineState <> E_PackMLState.Stopping AND eMachineState <> E_PackMLState.Stopped AND 
+       eMachineState <> E_PackMLState.Aborting AND eMachineState <> E_PackMLState.Aborted) THEN
+    eMachineState := E_PackMLState.Stopping;
 END_IF
 
 // 手動Abortコマンド
-IF bAbort AND (eMachineState <> E_PMLState.Aborting AND eMachineState <> E_PMLState.Aborted) THEN
-    eMachineState := E_PMLState.Aborting;
+IF bAbort AND (eMachineState <> E_PackMLState.Aborting AND eMachineState <> E_PackMLState.Aborted) THEN
+    eMachineState := E_PackMLState.Aborting;
 END_IF
 
 //--- 3. ユニットモード切替（静止状態でのみ許可） ---
 IF eRequestedUnitMode <> eUnitMode THEN
-    IF (eMachineState = E_PMLState.Stopped) OR (eMachineState = E_PMLState.Idle) OR (eMachineState = E_PMLState.Aborted) THEN
+    IF (eMachineState = E_PackMLState.Stopped) OR (eMachineState = E_PackMLState.Idle) OR (eMachineState = E_PackMLState.Aborted) THEN
         eUnitMode := eRequestedUnitMode;
         bModeChangeRejected := FALSE;
     ELSE
@@ -71,73 +71,73 @@ END_IF
 //--- 4. PackML コアステートマシン ---
 CASE eMachineState OF
 
-    E_PMLState.Aborting: // 非常停止処理中
+    E_PackMLState.Aborting: // 非常停止処理中
         bStopMachine := TRUE;
         bAllowManual := FALSE;
         IF bAbortDone OR (NOT bCritical AND liCriticalActiveCount = 0) THEN
-            eMachineState := E_PMLState.Aborted;
+            eMachineState := E_PackMLState.Aborted;
         END_IF
 
-    E_PMLState.Aborted: // 非常停止完了・復旧待ち
+    E_PackMLState.Aborted: // 非常停止完了・復旧待ち
         bStopMachine := TRUE;
         bAllowManual := FALSE;
         IF bReset AND (NOT bCritical AND liCriticalActiveCount = 0) THEN
-            eMachineState := E_PMLState.Resetting;
+            eMachineState := E_PackMLState.Resetting;
         END_IF
 
-    E_PMLState.Stopping: // 通常停止処理中
+    E_PackMLState.Stopping: // 通常停止処理中
         bStopMachine := TRUE;
         bAllowManual := FALSE;
         IF bStopDone THEN
-            eMachineState := E_PMLState.Stopped;
+            eMachineState := E_PackMLState.Stopped;
         END_IF
 
-    E_PMLState.Stopped: // 停止中（リセット待ち）
+    E_PackMLState.Stopped: // 停止中（リセット待ち）
         bStopMachine := TRUE;
         // Manualモード時かつエラーがなければ手動操作を許可する設計例
-        bAllowManual := (eUnitMode = E_PMLUnitMode.Manual) AND (liErrorActiveCount = 0);
+        bAllowManual := (eUnitMode = E_PackMLUnitMode.Manual) AND (liErrorActiveCount = 0);
         
         IF bReset AND (liErrorActiveCount = 0) THEN
-            eMachineState := E_PMLState.Resetting;
+            eMachineState := E_PackMLState.Resetting;
         END_IF
 
-    E_PMLState.Resetting: // 復旧・原点復帰中
+    E_PackMLState.Resetting: // 復旧・原点復帰中
         bStopMachine := FALSE;
         bAllowManual := FALSE;
         IF bResetDone THEN
-            eMachineState := E_PMLState.Idle;
+            eMachineState := E_PackMLState.Idle;
         END_IF
 
-    E_PMLState.Idle: // 運転準備完了
+    E_PackMLState.Idle: // 運転準備完了
         bStopMachine := FALSE;
-        bAllowManual := (eUnitMode = E_PMLUnitMode.Manual);
+        bAllowManual := (eUnitMode = E_PackMLUnitMode.Manual);
         
         IF bStart THEN
-            IF eUnitMode = E_PMLUnitMode.Manual THEN
+            IF eUnitMode = E_PackMLUnitMode.Manual THEN
                 // ManualモードならStartで直接Executeへ（またはIdleのまま手動操作）
-                eMachineState := E_PMLState.Execute;
+                eMachineState := E_PackMLState.Execute;
             ELSE
-                eMachineState := E_PMLState.Starting;
+                eMachineState := E_PackMLState.Starting;
             END_IF
         ELSIF bStop THEN
-            eMachineState := E_PMLState.Stopping;
+            eMachineState := E_PackMLState.Stopping;
         END_IF
 
-    E_PMLState.Starting: // 自動運転の開始処理（コンベア起動等）
+    E_PackMLState.Starting: // 自動運転の開始処理（コンベア起動等）
         bStopMachine := FALSE;
         bAllowManual := FALSE;
         IF bStartDone THEN
-            eMachineState := E_PMLState.Execute;
+            eMachineState := E_PackMLState.Execute;
         ELSIF bStop THEN
-            eMachineState := E_PMLState.Stopping;
+            eMachineState := E_PackMLState.Stopping;
         END_IF
 
-    E_PMLState.Execute: // 運転中
+    E_PackMLState.Execute: // 運転中
         bStopMachine := FALSE;
-        bAllowManual := (eUnitMode = E_PMLUnitMode.Manual);
+        bAllowManual := (eUnitMode = E_PackMLUnitMode.Manual);
         
         IF bStop THEN
-            eMachineState := E_PMLState.Stopping;
+            eMachineState := E_PackMLState.Stopping;
         END_IF
 
 END_CASE]]></ST>
@@ -198,7 +198,8 @@ END_VAR
       </Implementation>
     </Method>
     <LineIds Name="FB_MachineState_Sample">
-      <LineId Id="1" Count="103" />
+      <LineId Id="105" Count="0" />
+      <LineId Id="2" Count="102" />
     </LineIds>
     <LineIds Name="FB_MachineState_Sample.OnAlarmCleared">
       <LineId Id="1" Count="0" />

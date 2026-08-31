@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <TcPlcObject Version="1.1.0.1">
-  <POU Name="FB_AlarmListener" Id="{c9d0ed7a-eca4-4cf8-b2f3-c7311026fcca}" SpecialFunc="None">
-    <Declaration><![CDATA[FUNCTION_BLOCK FB_AlarmListener EXTENDS FB_ListenerBase2
+  <POU Name="FB_EventListener" Id="{c9d0ed7a-eca4-4cf8-b2f3-c7311026fcca}" SpecialFunc="None">
+    <Declaration><![CDATA[FUNCTION_BLOCK FB_EventListener EXTENDS FB_ListenerBase2
 VAR_IN_OUT
 	aEvents        				:ARRAY[*] OF ST_EventRead;
 END_VAR
@@ -83,12 +83,12 @@ VAR_INPUT
 	bInitRetains	:BOOL;		// if TRUE, the retain variables are initialized (warm start / cold start)
 	bInCopyCode		:BOOL; 		// if TRUE, the instance afterwards gets moved into the copy code (online change)
 	
-	AlarmGUID		:GUID;		//アラームのユーザーイベントのGUID
+	EventGUID		:GUID;		//アラームのユーザーイベントのGUID
 END_VAR
 ]]></Declaration>
       <Implementation>
         <ST><![CDATA[//GUIDの取得
-GUID:=AlarmGUID;
+GUID:=EventGUID;
 
 IF bInCopyCode = FALSE THEN
 	
@@ -182,20 +182,21 @@ THIS^.aEvents[udiErrEvents].sTime:=MID(tTimeBuf, 8, 12);
 OnAlarmRaised:=S_OK;]]></ST>
       </Implementation>
     </Method>
-    <LineIds Name="FB_AlarmListener">
+    <LineIds Name="FB_EventListener">
       <LineId Id="13" Count="0" />
       <LineId Id="2" Count="10" />
     </LineIds>
-    <LineIds Name="FB_AlarmListener.Execute">
+    <LineIds Name="FB_EventListener.Execute">
       <LineId Id="1" Count="32" />
     </LineIds>
-    <LineIds Name="FB_AlarmListener.FB_init">
-      <LineId Id="1" Count="11" />
+    <LineIds Name="FB_EventListener.FB_init">
+      <LineId Id="13" Count="10" />
+      <LineId Id="12" Count="0" />
     </LineIds>
-    <LineIds Name="FB_AlarmListener.OnAlarmCleared">
+    <LineIds Name="FB_EventListener.OnAlarmCleared">
       <LineId Id="1" Count="35" />
     </LineIds>
-    <LineIds Name="FB_AlarmListener.OnAlarmRaised">
+    <LineIds Name="FB_EventListener.OnAlarmRaised">
       <LineId Id="1" Count="24" />
     </LineIds>
   </POU>
