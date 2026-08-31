@@ -617,11 +617,20 @@
 		</DataType>
 	</DataTypes>
 	<Project ProjectGUID="{03A032F9-B6D2-8CC4-9E6B-69F13C79B4D2}" Target64Bit="true" ShowHideConfigurations="#x6">
+		<System>
+			<Tasks>
+				<Task Id="3" Priority="20" CycleTime="100000" AmsPort="350" AdtTasks="true">
+					<Name>PlcTask</Name>
+				</Task>
+			</Tasks>
+		</System>
 		<Plc>
 			<Project File="Wago7871664000080.xti"/>
 			<Project File="DiagnosisEtherCAT.xti"/>
 			<Project File="DiagnosisIOLinkMaster.xti"/>
 			<Project File="MachineControl.xti"/>
+			<Project File="SystemControl.xti"/>
+			<Project File="LibraryTest.xti"/>
 		</Plc>
 	</Project>
 </TcSmProject>
