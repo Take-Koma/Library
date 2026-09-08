@@ -3,39 +3,41 @@
   <POU Name="FB_PersistentDataManager" Id="{7da3955e-ec6e-465e-b930-d430a48663e4}" SpecialFunc="None">
     <Declaration><![CDATA[FUNCTION_BLOCK FB_PersistentDataManager
 VAR CONSTANT
-	MAGIC_NUMBER_DEFAULT	:UDINT	:= 16#5A5A_A5A5;
+	MAGIC_NUMBER_DEFAULT			:UDINT	:= 16#5A5A_A5A5;
 END_VAR
 VAR_INPUT
 END_VAR
 VAR_OUTPUT
-	bPersistentDataLoadError:BOOL;				//パーシステントデータロードエラー発生
-    ERR						:BOOL;				//FB_WritePersistentDataのエラー発生
-	ERRID					:UDINT;				//FB_WritePersistentDataのエラーID
-	ipResultMessage			:I_TCMessage;		//TkPersistentDataEventClass
+	bPersistentDataLoadError		:BOOL;				//パーシステントデータロードエラー発生
+    bWritePersistentDataError		:BOOL;				//FB_WritePersistentDataのエラー発生
+	bWritePersistentDataErrorID		:UDINT;				//FB_WritePersistentDataのエラーID
+	bWritePersistentDataDone		:BOOL;				//パーシステントデータ保存完了
+	ipResultMessage					:I_TCMessage;		//TkPersistentDataEventClass
 END_VAR
 VAR
 //---パーシステントデータ読み出し状態チェック---
-	bInit					:BOOL:=FALSE;		//1サイクル目のみ実行用
-	bDataLoadFault			:BOOL;				//TRUE: 完全読み込み失敗
-	bOldDataLoad			:BOOL;				//TRUE: バックアップ(.bootdata-old)から読み込み
-	bDataLoadPartial		:BOOL;				//TRUE: 一部のみ読み込み実施
+	bInit							:BOOL:=FALSE;		//1サイクル目のみ実行用
+	bDataLoadFault					:BOOL;				//TRUE: 完全読み込み失敗
+	bOldDataLoad					:BOOL;				//TRUE: バックアップ(.bootdata-old)から読み込み
+	bDataLoadPartial				:BOOL;				//TRUE: 一部のみ読み込み実施
 	
 	{attribute 'TcPersistent'}
-	nMagicNumber			:UDINT;				//パーシステントデータの初期化・未初期化状態を検出用マジックナンバー
-	bMagicMismatch			:BOOL;				//TRUE: マジックナンバー不一致
+	nMagicNumber					:UDINT;				//パーシステントデータの初期化・未初期化状態を検出用マジックナンバー
+	bMagicMismatch					:BOOL;				//TRUE: マジックナンバー不一致
 
 //---内部処理用---
-    fbWritePersistentData	:FB_WritePersistentData;
-    _PcAmsNetId				:AMSNETID;
+    fbWritePersistentData			:FB_WritePersistentData;
+    _PcAmsNetId						:AMSNETID;
 
-	fbMessage				:FB_TcMessage;
+	fbMessage						:FB_TcMessage;
 	
 	fbWritePersistentDataErrREdge	:R_TRIG;
 
 //---書き込みフラグ処理用---
-	bWriteReq				:BOOL;				// RequestWrite()で立つ
-	bWritePending			:BOOL;				// Busy中の要求を集約（1bitで十分）
-	bStartPulse				:BOOL;				// START用1サイクルパルス
+	bWriteReq						:BOOL;				// RequestWrite()で立つ
+	bWritePending					:BOOL;				// Busy中の要求を集約
+	bStartPulse						:BOOL;				// START用1サイクルパルス
+	bStartPulseMem					:BOOL;				// START記憶
 
 END_VAR
 
@@ -106,12 +108,13 @@ END_VAR
 	//保存シーケンスの開始条件
 	IF NOT fbWritePersistentData.BUSY AND (bWriteReq OR bWritePending) THEN
 		bStartPulse		:=TRUE;
+		bStartPulseMem	:=TRUE;
 		bWriteReq		:=FALSE;
 		bWritePending	:=FALSE;
 		
 		//新規保存に備えてエラー出力をリセット
-		ERR				:=FALSE;
-		ERRID			:=0;
+		bWritePersistentDataError		:=FALSE;
+		bWritePersistentDataErrorID		:=0;
 	END_IF
 
 
@@ -126,12 +129,21 @@ END_VAR
 							ERRID	=>
 							);
 
+//---パーシステントデータ保存完了検出---
+	//Doneはパルスなのでクリア
+	bWritePersistentDataDone:=FALSE;
+	
+	IF bStartPulseMem AND NOT fbWritePersistentData.BUSY THEN
+		bWritePersistentDataDone:=TRUE;
+		bStartPulseMem			:=FALSE;
+	END_IF
+
 //---パーシステントデータ書き込みFBエラー処理---
 	fbWritePersistentDataErrREdge(CLK:=fbWritePersistentData);
 	
 	IF fbWritePersistentDataErrREdge.Q THEN
-		ERR:=TRUE;
-		ERRID:=fbWritePersistentData.ERRID;
+		bWritePersistentDataError:=TRUE;
+		bWritePersistentDataErrorID:=fbWritePersistentData.ERRID;
 		fbMessage.CreateEx(stEventEntry:=TC_EVENTS.TkPersistentDataEventClass.PersistentDataWriteError);
 		ipResultMessage:=fbMessage;
 		
@@ -189,63 +201,24 @@ END_VAR]]></Declaration>
 ]]></Declaration>
       <Implementation>
         <ST><![CDATA[//エラー出力をリセット
-ERR:=FALSE;
-ERRID:=0;
+bWritePersistentDataError:=FALSE;
+bWritePersistentDataErrorID:=0;
 fbMessage.Release();
 ipResultMessage:=fbMessage;]]></ST>
       </Implementation>
     </Method>
     <LineIds Name="FB_PersistentDataManager">
-      <LineId Id="80" Count="0" />
-      <LineId Id="83" Count="0" />
-      <LineId Id="115" Count="0" />
-      <LineId Id="84" Count="0" />
-      <LineId Id="86" Count="0" />
-      <LineId Id="98" Count="0" />
-      <LineId Id="97" Count="0" />
-      <LineId Id="96" Count="0" />
-      <LineId Id="95" Count="0" />
-      <LineId Id="100" Count="0" />
-      <LineId Id="92" Count="1" />
-      <LineId Id="101" Count="0" />
-      <LineId Id="114" Count="0" />
-      <LineId Id="87" Count="1" />
-      <LineId Id="102" Count="1" />
-      <LineId Id="105" Count="1" />
-      <LineId Id="166" Count="0" />
-      <LineId Id="168" Count="20" />
-      <LineId Id="167" Count="0" />
-      <LineId Id="108" Count="0" />
-      <LineId Id="107" Count="0" />
-      <LineId Id="89" Count="1" />
-      <LineId Id="133" Count="1" />
-      <LineId Id="85" Count="0" />
-      <LineId Id="81" Count="0" />
-      <LineId Id="136" Count="0" />
-      <LineId Id="117" Count="0" />
-      <LineId Id="137" Count="0" />
-      <LineId Id="3" Count="0" />
-      <LineId Id="15" Count="1" />
-      <LineId Id="19" Count="7" />
-      <LineId Id="31" Count="1" />
-      <LineId Id="196" Count="0" />
-      <LineId Id="198" Count="1" />
-      <LineId Id="197" Count="0" />
-      <LineId Id="33" Count="0" />
-      <LineId Id="138" Count="0" />
-      <LineId Id="34" Count="1" />
-      <LineId Id="120" Count="7" />
-      <LineId Id="119" Count="0" />
-      <LineId Id="128" Count="1" />
-      <LineId Id="144" Count="0" />
-      <LineId Id="131" Count="0" />
-      <LineId Id="189" Count="1" />
-      <LineId Id="195" Count="0" />
-      <LineId Id="192" Count="0" />
-      <LineId Id="194" Count="0" />
-      <LineId Id="193" Count="0" />
-      <LineId Id="191" Count="0" />
-      <LineId Id="140" Count="0" />
+      <LineId Id="296" Count="64" />
+      <LineId Id="392" Count="0" />
+      <LineId Id="361" Count="18" />
+      <LineId Id="393" Count="1" />
+      <LineId Id="401" Count="0" />
+      <LineId Id="400" Count="0" />
+      <LineId Id="399" Count="0" />
+      <LineId Id="395" Count="1" />
+      <LineId Id="398" Count="0" />
+      <LineId Id="397" Count="0" />
+      <LineId Id="380" Count="11" />
       <LineId Id="78" Count="0" />
     </LineIds>
     <LineIds Name="FB_PersistentDataManager.AcknowledgePersistentReset">
@@ -267,9 +240,7 @@ ipResultMessage:=fbMessage;]]></ST>
       <LineId Id="1" Count="0" />
     </LineIds>
     <LineIds Name="FB_PersistentDataManager.ResetError">
-      <LineId Id="6" Count="0" />
-      <LineId Id="1" Count="1" />
-      <LineId Id="5" Count="0" />
+      <LineId Id="11" Count="3" />
       <LineId Id="3" Count="0" />
     </LineIds>
   </POU>
