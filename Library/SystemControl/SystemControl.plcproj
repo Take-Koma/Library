@@ -44,8 +44,8 @@
 パーシステントデータ管理、</Description>
   </PropertyGroup>
   <ItemGroup>
-    <Folder Include="PcManagement" />
-    <Folder Include="PcManagement\1sUPS" />
+    <Folder Include="PcPower" />
+    <Folder Include="PcPower\1sUPS" />
     <Folder Include="PersistentData" />
     <Folder Include="PersistentData\[obsolete]" />
     <Folder Include="Version" />
@@ -78,16 +78,16 @@
     </PlaceholderReference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="PcManagement\1sUPS\FB_1sUPS_BAPI.TcPOU">
+    <Compile Include="PcPower\1sUPS\FB_1sUPS_BAPI.TcPOU">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="PcManagement\1sUPS\FB_1sUPS_CX81xx.TcPOU">
+    <Compile Include="PcPower\1sUPS\FB_1sUPS_CX81xx.TcPOU">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="PcManagement\1sUPS\i1sUPS.TcIO">
+    <Compile Include="PcPower\1sUPS\i1sUPS.TcIO">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="PcManagement\FB_PcPowerManagement.TcPOU">
+    <Compile Include="PcPower\FB_PcPowerManagement.TcPOU">
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="PersistentData\FB_PersistentDataManager.TcPOU">
@@ -102,6 +102,11 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="ExternalTypes.tmc">
+      <SubType>Content</SubType>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="SystemControl.tmc">
       <SubType>Content</SubType>
     </None>
   </ItemGroup>
