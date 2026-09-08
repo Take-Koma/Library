@@ -1,0 +1,6 @@
+<?xml version="1.0"?>
+<TcSmItem xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://www.beckhoff.com/schemas/2012/07/TcSmProject" TcSmVersion="1.0" TcVersion="3.1.4026.25" ClassName="CNestedPlcProjDef">
+	<Project GUID="{25422305-169F-4F0C-B510-425C7746D626}" Name="SystemControl" PrjFilePath="..\..\SystemControl\SystemControl.plcproj" TmcFilePath="..\..\SystemControl\SystemControl.tmc" ReloadTmc="true" AmsPort="856" FileArchiveSettings="#x000e" SymbolicMapping="true">
+		<Instance File="SystemControl Instance.xti"/>
+	</Project>
+</TcSmItem>

@@ -1,0 +1,268 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1">
+  <POU Name="FB_PersistentDataManager" Id="{7da3955e-ec6e-465e-b930-d430a48663e4}" SpecialFunc="None">
+    <Declaration><![CDATA[FUNCTION_BLOCK FB_PersistentDataManager
+VAR CONSTANT
+	MAGIC_NUMBER_DEFAULT	:UDINT	:= 16#5A5A_A5A5;
+END_VAR
+VAR_INPUT
+END_VAR
+VAR_OUTPUT
+	bPersistentDataLoadError:BOOL;				//パーシステントデータロードエラー発生
+    ERR						:BOOL;				//FB_WritePersistentDataのエラー発生
+	ERRID					:UDINT;				//FB_WritePersistentDataのエラーID
+	ipResultMessage			:I_TCMessage;		//TkPersistentDataEventClass
+END_VAR
+VAR
+//---パーシステントデータ読み出し状態チェック---
+	bInit					:BOOL:=FALSE;		//1サイクル目のみ実行用
+	bDataLoadFault			:BOOL;				//TRUE: 完全読み込み失敗
+	bOldDataLoad			:BOOL;				//TRUE: バックアップ(.bootdata-old)から読み込み
+	bDataLoadPartial		:BOOL;				//TRUE: 一部のみ読み込み実施
+	
+	{attribute 'TcPersistent'}
+	nMagicNumber			:UDINT;				//リセットオリジン等検出用マジックナンバー
+	bMagicMismatch			:BOOL;				//TRUE: マジックナンバー不一致
+
+//---内部処理用---
+    fbWritePersistentData	:FB_WritePersistentData;
+    _PcAmsNetId				:AMSNETID;
+
+	fbMessage				:FB_TcMessage;
+	
+	fbWritePersistentDataErrREdge	:R_TRIG;
+
+//---書き込みフラグ処理用---
+	bWriteReq				:BOOL;				// RequestWrite()で立つ
+	bWritePending			:BOOL;				// Busy中の要求を集約（1bitで十分）
+	bStartPulse				:BOOL;				// START用1サイクルパルス
+
+END_VAR
+
+]]></Declaration>
+    <Implementation>
+      <ST><![CDATA[//---1サイクル目のみ実行---
+	IF NOT bInit THEN
+		//システム情報のチェック
+		CASE _AppInfo.PersistentStatus OF
+			EPlcPersistentStatus.PS_All:
+				bDataLoadFault		:=FALSE;
+				bDataLoadPartial	:=FALSE;
+			
+			EPlcPersistentStatus.PS_None:
+				bDataLoadFault		:=TRUE;
+			
+			EPlcPersistentStatus.PS_Partial:
+				bDataLoadPartial	:=TRUE;
+
+		END_CASE
+		
+		bOldDataLoad:=_AppInfo.OldBootData;
+		
+		//マジックナンバーのチェック
+		bMagicMismatch:=(nMagicNumber<>MAGIC_NUMBER_DEFAULT);
+
+		//---エラー出力---
+		IF bDataLoadFault THEN
+			bPersistentDataLoadError:=TRUE;
+			fbMessage.CreateEx(stEventEntry:=TC_EVENTS.TkPersistentDataEventClass.PersistentDataLoadFault);
+			ipResultMessage:=fbMessage;
+		
+		ELSIF bDataLoadPartial THEN
+			bPersistentDataLoadError:=TRUE;
+			fbMessage.CreateEx(stEventEntry:=TC_EVENTS.TkPersistentDataEventClass.PersistentDataLoadPartial);
+			ipResultMessage:=fbMessage;
+		
+		ELSIF bOldDataLoad THEN
+			bPersistentDataLoadError:=TRUE;
+			fbMessage.CreateEx(stEventEntry:=TC_EVENTS.TkPersistentDataEventClass.OldPersistentDataLoad);
+			ipResultMessage:=fbMessage;
+		
+		ELSIF bMagicMismatch THEN
+			bPersistentDataLoadError:=TRUE;
+			fbMessage.CreateEx(stEventEntry:=TC_EVENTS.TkPersistentDataEventClass.ParsistentDataInitialization);
+			ipResultMessage:=fbMessage;
+			
+		END_IF
+
+		//フラグを切り替え
+		bInit:=TRUE;
+		
+		RETURN;
+		
+	END_IF
+
+
+//---パーシステントデータ書き込みリクエストチェック---
+	//パルスクリア
+	bStartPulse		:=FALSE;	
+
+	//処理中の要求集約
+	IF fbWritePersistentData.BUSY AND bWriteReq THEN
+		bWritePending	:=TRUE;
+		bWriteReq		:=FALSE;
+	END_IF
+
+	//保存シーケンスの開始条件
+	IF NOT fbWritePersistentData.BUSY AND (bWriteReq OR bWritePending) THEN
+		bStartPulse		:=TRUE;
+		bWriteReq		:=FALSE;
+		bWritePending	:=FALSE;
+	END_IF
+
+
+//---パーシステントデータ書き込みFBの実行---
+	fbWritePersistentData(	NETID	:=F_CreateAmsNetId(_PcAmsNetId),
+							PORT	:=_AppInfo.AdsPort,
+							START	:=bStartPulse,
+							TMOUT	:=DEFAULT_ADS_TIMEOUT,
+							MODE	:=E_PersistentMode.SPDM_2PASS,
+							BUSY	=>,
+							ERR		=>fbWritePersistentDataErrREdge.CLK,
+							ERRID	=>
+							);
+
+//---パーシステントデータ書き込みFBエラー処理---
+	fbWritePersistentDataErrREdge();
+	
+	IF fbWritePersistentDataErrREdge.Q THEN
+		ERR:=TRUE;
+		ERRID:=fbWritePersistentData.ERRID;
+		fbMessage.CreateEx(stEventEntry:=TC_EVENTS.TkPersistentDataEventClass.PersistentDataWriteError);
+		ipResultMessage:=fbMessage;
+		
+	END_IF
+
+]]></ST>
+    </Implementation>
+    <Method Name="AcknowledgePersistentReset" Id="{7687dfad-63a8-4491-a427-161e519e86cf}">
+      <Declaration><![CDATA[METHOD AcknowledgePersistentReset
+]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[//マジックナンバーを正値に修復
+nMagicNumber:=MAGIC_NUMBER_DEFAULT;
+
+//パーシステントデータ保存
+bWriteReq:=TRUE;
+
+//エラーフラグをリセット
+bDataLoadFault		:=FALSE;
+bDataLoadPartial	:=FALSE;
+bOldDataLoad		:=FALSE;
+bMagicMismatch		:=FALSE;
+
+//エラー出力をリセット
+bPersistentDataLoadError:=FALSE;
+fbMessage.Release();
+ipResultMessage:=fbMessage;
+]]></ST>
+      </Implementation>
+    </Method>
+    <Method Name="FB_Init" Id="{e220c860-5388-4521-a00f-ff98ea60f3a2}">
+      <Declaration><![CDATA[//FB_Init は常に暗黙的に使用可能で、主に初期化に使用されます。
+//戻り値は評価されません。特定の結果を得るために、メソッドを明示的に宣言し、
+//そのメソッドに標準の初期化コードをもったコードを追加することができます。戻り値を評価できます。
+METHOD FB_Init: BOOL
+VAR_INPUT
+    bInitRetains: BOOL; // TRUE: 保持変数は初期化されます (ウォーム リセット、あるいはコールド リセット)
+    bInCopyCode: BOOL;  // TRUE: 後でコードをコピーする (オンライン変更) ために、インスタンスをコピーします。
+
+	PcAmsNetId			:AMSNETID;		//PC AMS Net ID
+END_VAR]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[_PcAmsNetId:=PcAmsNetId;]]></ST>
+      </Implementation>
+    </Method>
+    <Method Name="RequestWrite" Id="{956febae-5928-4a8e-9a40-f9919d943fbc}">
+      <Declaration><![CDATA[METHOD RequestWrite
+]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[bWriteReq:=TRUE;]]></ST>
+      </Implementation>
+    </Method>
+    <Method Name="ResetError" Id="{6b94b28d-81df-4c11-8cbe-c9ec2b5915e1}">
+      <Declaration><![CDATA[METHOD ResetError
+]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[//エラー出力をリセット
+ERR:=FALSE;
+ERRID:=0;
+fbMessage.Release();
+ipResultMessage:=fbMessage;]]></ST>
+      </Implementation>
+    </Method>
+    <LineIds Name="FB_PersistentDataManager">
+      <LineId Id="80" Count="0" />
+      <LineId Id="83" Count="0" />
+      <LineId Id="115" Count="0" />
+      <LineId Id="84" Count="0" />
+      <LineId Id="86" Count="0" />
+      <LineId Id="98" Count="0" />
+      <LineId Id="97" Count="0" />
+      <LineId Id="96" Count="0" />
+      <LineId Id="95" Count="0" />
+      <LineId Id="100" Count="0" />
+      <LineId Id="92" Count="1" />
+      <LineId Id="101" Count="0" />
+      <LineId Id="114" Count="0" />
+      <LineId Id="87" Count="1" />
+      <LineId Id="102" Count="1" />
+      <LineId Id="105" Count="1" />
+      <LineId Id="166" Count="0" />
+      <LineId Id="168" Count="20" />
+      <LineId Id="167" Count="0" />
+      <LineId Id="108" Count="0" />
+      <LineId Id="107" Count="0" />
+      <LineId Id="89" Count="1" />
+      <LineId Id="133" Count="1" />
+      <LineId Id="85" Count="0" />
+      <LineId Id="81" Count="0" />
+      <LineId Id="136" Count="0" />
+      <LineId Id="117" Count="0" />
+      <LineId Id="137" Count="0" />
+      <LineId Id="3" Count="0" />
+      <LineId Id="15" Count="1" />
+      <LineId Id="19" Count="7" />
+      <LineId Id="31" Count="2" />
+      <LineId Id="138" Count="0" />
+      <LineId Id="34" Count="1" />
+      <LineId Id="120" Count="7" />
+      <LineId Id="119" Count="0" />
+      <LineId Id="128" Count="1" />
+      <LineId Id="144" Count="0" />
+      <LineId Id="131" Count="0" />
+      <LineId Id="189" Count="1" />
+      <LineId Id="195" Count="0" />
+      <LineId Id="192" Count="0" />
+      <LineId Id="194" Count="0" />
+      <LineId Id="193" Count="0" />
+      <LineId Id="191" Count="0" />
+      <LineId Id="140" Count="0" />
+      <LineId Id="78" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_PersistentDataManager.AcknowledgePersistentReset">
+      <LineId Id="1" Count="4" />
+      <LineId Id="10" Count="2" />
+      <LineId Id="8" Count="0" />
+      <LineId Id="14" Count="0" />
+      <LineId Id="13" Count="0" />
+      <LineId Id="16" Count="0" />
+      <LineId Id="15" Count="0" />
+      <LineId Id="19" Count="1" />
+      <LineId Id="18" Count="0" />
+      <LineId Id="17" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_PersistentDataManager.FB_Init">
+      <LineId Id="1" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_PersistentDataManager.RequestWrite">
+      <LineId Id="1" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_PersistentDataManager.ResetError">
+      <LineId Id="6" Count="0" />
+      <LineId Id="1" Count="1" />
+      <LineId Id="5" Count="0" />
+      <LineId Id="3" Count="0" />
+    </LineIds>
+  </POU>
+</TcPlcObject>

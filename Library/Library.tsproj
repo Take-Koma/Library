@@ -210,6 +210,22 @@
 		<Text TxtId="Port {0}  No error">
 			<Text LcId="1041"><![CDATA[ポート {0}  エラー無し]]></Text>
 		</Text>
+		<Text TxtId="TkPersistentDataEventClass"/>
+		<Text TxtId="Parsistent Data Initialization">
+			<Text LcId="1041"><![CDATA[パーシステントデータの初期化]]></Text>
+		</Text>
+		<Text TxtId="Persistent Data Load Fault">
+			<Text LcId="1041"><![CDATA[パーシステントデータロード障害]]></Text>
+		</Text>
+		<Text TxtId="Old Persistent Data Load">
+			<Text LcId="1041"><![CDATA[Oldパーシステントデータのロード]]></Text>
+		</Text>
+		<Text TxtId="Persistent Data Write Error">
+			<Text LcId="1041"><![CDATA[パーシステントデータ書き込みエラー]]></Text>
+		</Text>
+		<Text TxtId="Persistent Data Load Partial">
+			<Text LcId="1041"><![CDATA[パーシステントデータの部分的なロード]]></Text>
+		</Text>
 	</Translations>
 	<DataTypes>
 		<DataType>
@@ -613,6 +629,43 @@
 				<Hide GUID="{A35CDE81-4817-4D2A-8DE5-375225953B83}"/>
 				<Hide GUID="{FBB9F208-9340-45AB-9F44-13C417C4FFB3}"/>
 				<Hide GUID="{22995F2F-139A-431D-A43E-1A30F0213FEA}"/>
+			</Hides>
+		</DataType>
+		<DataType>
+			<Name GUID="{914D0CB1-499C-463C-B57B-674D8C839051}" PersistentType="true">TkPersistentDataEventClass</Name>
+			<DisplayName TxtId=""><![CDATA[TkPersistentDataEventClass]]></DisplayName>
+			<EventId>
+				<Name Id="4">ParsistentDataInitialization</Name>
+				<DisplayName TxtId=""><![CDATA[Parsistent Data Initialization]]></DisplayName>
+				<Severity>Warning</Severity>
+			</EventId>
+			<EventId>
+				<Name Id="1">PersistentDataLoadFault</Name>
+				<DisplayName TxtId=""><![CDATA[Persistent Data Load Fault]]></DisplayName>
+				<Severity>Error</Severity>
+			</EventId>
+			<EventId>
+				<Name Id="2">OldPersistentDataLoad</Name>
+				<DisplayName TxtId=""><![CDATA[Old Persistent Data Load]]></DisplayName>
+				<Severity>Warning</Severity>
+			</EventId>
+			<EventId>
+				<Name Id="5">PersistentDataWriteError</Name>
+				<DisplayName TxtId=""><![CDATA[Persistent Data Write Error]]></DisplayName>
+				<Severity>Error</Severity>
+			</EventId>
+			<EventId>
+				<Name Id="3">PersistentDataLoadPartial</Name>
+				<DisplayName TxtId=""><![CDATA[Persistent Data Load Partial]]></DisplayName>
+				<Severity>Error</Severity>
+			</EventId>
+			<Hides>
+				<Hide GUID="{83B3C058-5836-4479-AEBB-4B9D1BE8371F}"/>
+				<Hide GUID="{F80459D6-1B51-49CD-80E7-0FB0FAA81496}"/>
+				<Hide GUID="{BADA6E72-6458-403B-9785-7D1AA3036443}"/>
+				<Hide GUID="{E6DF9E1A-EFCB-4715-907B-7355DADC70BE}"/>
+				<Hide GUID="{1A07DEBC-AFE6-445E-94E4-62D2C786E652}"/>
+				<Hide GUID="{05916388-1669-47E5-9EFD-14D48F7A12CE}"/>
 			</Hides>
 		</DataType>
 	</DataTypes>

@@ -28,8 +28,18 @@
     マシンの管理用ライブラリ  
     アラーム、4024用イベントリード、マシンステート 
 ### 使用Beckhoffライブラリ
-    Tc2_Utillities
+    Tc2_Utilities  
     Tc3_EventLogger 
+
+## Tk_SystemControl
+### 説明
+    システム管理用ライブラリ  
+    パーシステントデータ管理、PCマネージメント 
+### 使用Beckhoffライブラリ
+    Tc2_Utilities  
+    Tc2_SUPS  
+    Tc3_EventLogger  
+
 
 ## メモ
     libraryとは関係が薄いですが、個人用のメモ
