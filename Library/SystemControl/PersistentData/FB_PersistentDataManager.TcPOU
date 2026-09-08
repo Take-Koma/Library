@@ -21,7 +21,7 @@ VAR
 	bDataLoadPartial		:BOOL;				//TRUE: 一部のみ読み込み実施
 	
 	{attribute 'TcPersistent'}
-	nMagicNumber			:UDINT;				//リセットオリジン等検出用マジックナンバー
+	nMagicNumber			:UDINT;				//パーシステントデータの初期化・未初期化状態を検出用マジックナンバー
 	bMagicMismatch			:BOOL;				//TRUE: マジックナンバー不一致
 
 //---内部処理用---
@@ -108,6 +108,10 @@ END_VAR
 		bStartPulse		:=TRUE;
 		bWriteReq		:=FALSE;
 		bWritePending	:=FALSE;
+		
+		//新規保存に備えてエラー出力をリセット
+		ERR				:=FALSE;
+		ERRID			:=0;
 	END_IF
 
 
@@ -118,12 +122,12 @@ END_VAR
 							TMOUT	:=DEFAULT_ADS_TIMEOUT,
 							MODE	:=E_PersistentMode.SPDM_2PASS,
 							BUSY	=>,
-							ERR		=>fbWritePersistentDataErrREdge.CLK,
+							ERR		=>,
 							ERRID	=>
 							);
 
 //---パーシステントデータ書き込みFBエラー処理---
-	fbWritePersistentDataErrREdge();
+	fbWritePersistentDataErrREdge(CLK:=fbWritePersistentData);
 	
 	IF fbWritePersistentDataErrREdge.Q THEN
 		ERR:=TRUE;
@@ -223,7 +227,11 @@ ipResultMessage:=fbMessage;]]></ST>
       <LineId Id="3" Count="0" />
       <LineId Id="15" Count="1" />
       <LineId Id="19" Count="7" />
-      <LineId Id="31" Count="2" />
+      <LineId Id="31" Count="1" />
+      <LineId Id="196" Count="0" />
+      <LineId Id="198" Count="1" />
+      <LineId Id="197" Count="0" />
+      <LineId Id="33" Count="0" />
       <LineId Id="138" Count="0" />
       <LineId Id="34" Count="1" />
       <LineId Id="120" Count="7" />
