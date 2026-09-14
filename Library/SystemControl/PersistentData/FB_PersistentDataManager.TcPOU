@@ -83,15 +83,13 @@ END_VAR
 		
 		ELSIF bMagicMismatch THEN
 			bPersistentDataLoadError:=TRUE;
-			fbMessage.CreateEx(stEventEntry:=TC_EVENTS.TkPersistentDataEventClass.ParsistentDataInitialization);
+			fbMessage.CreateEx(stEventEntry:=TC_EVENTS.TkPersistentDataEventClass.PersistentDataInitialization);
 			ipResultMessage:=fbMessage;
 			
 		END_IF
 
 		//フラグを切り替え
 		bInit:=TRUE;
-		
-		RETURN;
 		
 	END_IF
 
@@ -176,8 +174,8 @@ bMagicMismatch		:=FALSE;
 
 //エラー出力をリセット
 bPersistentDataLoadError:=FALSE;
-fbMessage.Release();
 ipResultMessage:=0;
+fbMessage.Release();
 ]]></ST>
       </Implementation>
     </Method>
@@ -210,12 +208,13 @@ END_VAR]]></Declaration>
         <ST><![CDATA[//エラー出力をリセット
 bWritePersistentDataError:=FALSE;
 bWritePersistentDataErrorID:=0;
-fbMessage.Release();
-ipResultMessage:=0;]]></ST>
+ipResultMessage:=0;
+fbMessage.Release();]]></ST>
       </Implementation>
     </Method>
     <LineIds Name="FB_PersistentDataManager">
-      <LineId Id="409" Count="111" />
+      <LineId Id="409" Count="45" />
+      <LineId Id="457" Count="63" />
       <LineId Id="78" Count="0" />
     </LineIds>
     <LineIds Name="FB_PersistentDataManager.AcknowledgePersistentReset">
@@ -226,9 +225,10 @@ ipResultMessage:=0;]]></ST>
       <LineId Id="13" Count="0" />
       <LineId Id="16" Count="0" />
       <LineId Id="15" Count="0" />
-      <LineId Id="19" Count="1" />
+      <LineId Id="19" Count="0" />
       <LineId Id="18" Count="0" />
       <LineId Id="17" Count="0" />
+      <LineId Id="20" Count="0" />
     </LineIds>
     <LineIds Name="FB_PersistentDataManager.FB_Init">
       <LineId Id="1" Count="0" />
@@ -237,8 +237,9 @@ ipResultMessage:=0;]]></ST>
       <LineId Id="1" Count="0" />
     </LineIds>
     <LineIds Name="FB_PersistentDataManager.ResetError">
-      <LineId Id="11" Count="3" />
+      <LineId Id="11" Count="2" />
       <LineId Id="3" Count="0" />
+      <LineId Id="15" Count="0" />
     </LineIds>
   </POU>
 </TcPlcObject>

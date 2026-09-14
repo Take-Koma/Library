@@ -211,7 +211,7 @@
 			<Text LcId="1041"><![CDATA[ポート {0}  エラー無し]]></Text>
 		</Text>
 		<Text TxtId="TkPersistentDataEventClass"/>
-		<Text TxtId="Parsistent Data Initialization">
+		<Text TxtId="Persistent Data Initialization">
 			<Text LcId="1041"><![CDATA[パーシステントデータの初期化]]></Text>
 		</Text>
 		<Text TxtId="Persistent Data Load Fault">
@@ -632,11 +632,11 @@
 			</Hides>
 		</DataType>
 		<DataType>
-			<Name GUID="{914D0CB1-499C-463C-B57B-674D8C839051}" PersistentType="true">TkPersistentDataEventClass</Name>
+			<Name GUID="{4449676E-202B-4DDC-B9A4-FFE3761220CF}" PersistentType="true">TkPersistentDataEventClass</Name>
 			<DisplayName TxtId=""><![CDATA[TkPersistentDataEventClass]]></DisplayName>
 			<EventId>
-				<Name Id="4">ParsistentDataInitialization</Name>
-				<DisplayName TxtId=""><![CDATA[Parsistent Data Initialization]]></DisplayName>
+				<Name Id="4">PersistentDataInitialization</Name>
+				<DisplayName TxtId=""><![CDATA[Persistent Data Initialization]]></DisplayName>
 				<Severity>Warning</Severity>
 			</EventId>
 			<EventId>
@@ -666,6 +666,7 @@
 				<Hide GUID="{E6DF9E1A-EFCB-4715-907B-7355DADC70BE}"/>
 				<Hide GUID="{1A07DEBC-AFE6-445E-94E4-62D2C786E652}"/>
 				<Hide GUID="{05916388-1669-47E5-9EFD-14D48F7A12CE}"/>
+				<Hide GUID="{914D0CB1-499C-463C-B57B-674D8C839051}"/>
 			</Hides>
 		</DataType>
 	</DataTypes>
