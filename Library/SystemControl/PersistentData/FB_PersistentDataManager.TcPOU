@@ -17,28 +17,26 @@ END_VAR
 VAR
 //---パーシステントデータ読み出し状態チェック---
 	bInit							:BOOL:=FALSE;		//1サイクル目のみ実行用
-	bDataLoadFault					:BOOL;				//TRUE: 完全読み込み失敗
-	bOldDataLoad					:BOOL;				//TRUE: バックアップ(.bootdata-old)から読み込み
-	bDataLoadPartial				:BOOL;				//TRUE: 一部のみ読み込み実施
+	bDataLoadFault					:BOOL:=FALSE;		//TRUE: 完全読み込み失敗
+	bOldDataLoad					:BOOL:=FALSE;		//TRUE: バックアップ(.bootdata-old)から読み込み
+	bDataLoadPartial				:BOOL:=FALSE;		//TRUE: 一部のみ読み込み実施
 	
 	{attribute 'TcPersistent'}
 	nMagicNumber					:UDINT;				//パーシステントデータの初期化・未初期化状態を検出用マジックナンバー
-	bMagicMismatch					:BOOL;				//TRUE: マジックナンバー不一致
+	bMagicMismatch					:BOOL:=FALSE;		//TRUE: マジックナンバー不一致
 
 //---内部処理用---
     fbWritePersistentData			:FB_WritePersistentData;
     _PcAmsNetId						:AMSNETID;
 
 	fbMessage						:FB_TcMessage;
-	
-	fbWritePersistentDataErrREdge	:R_TRIG;
-	fbWritePersistentDataBusyFEdge	:F_TRIG;
 
 //---書き込みフラグ処理用---
-	bWriteReq						:BOOL;				// RequestWrite()で立つ
-	bWritePending					:BOOL;				// Busy中の要求を集約
-	bStartPulse						:BOOL;				// START用1サイクルパルス
-	bStartPulseMem					:BOOL;				// START記憶
+	bWriteReq						:BOOL:=FALSE;		//RequestWrite()で立つ
+	bWritePending					:BOOL;				//Busy中の要求を集約
+	bStartPulse						:BOOL;				//START用1サイクルパルス
+	bInProgress						:BOOL;				//パーシステントデータ保存実行中フラグ
+	bWritePersistentDataBusyPrev	:BOOL;				//前スキャンの BUSY 状態記憶用
 
 END_VAR
 
@@ -96,8 +94,15 @@ END_VAR
 
 //---パーシステントデータ書き込みリクエストチェック---
 	//パルスクリア
-	bStartPulse		:=FALSE;	
+	bStartPulse		:=FALSE;
+	
+	//パーシステントデータのロード失敗時は書き込みリクエスト破棄
+	IF bPersistentDataLoadError THEN
+		bWriteReq		:=FALSE;
+		bWritePending	:=FALSE;
+	END_IF
 
+ 
 	//処理中の要求集約
 	IF fbWritePersistentData.BUSY AND bWriteReq THEN
 		bWritePending	:=TRUE;
@@ -107,7 +112,7 @@ END_VAR
 	//保存シーケンスの開始条件
 	IF NOT fbWritePersistentData.BUSY AND (bWriteReq OR bWritePending) THEN
 		bStartPulse		:=TRUE;
-		bStartPulseMem	:=TRUE;
+		bInProgress		:=TRUE;
 		bWriteReq		:=FALSE;
 		bWritePending	:=FALSE;
 		
@@ -128,31 +133,36 @@ END_VAR
 							ERRID	=>
 							);
 
-//---パーシステントデータ保存完了検出---
+//---パーシステントデータ保存完了とパーシステントデータ書き込みFBエラー検出---
 	//Doneはパルスなのでクリア
 	bWritePersistentDataDone:=FALSE;
 	
-	fbWritePersistentDataBusyFEdge(CLK:=fbWritePersistentData.BUSY);
-	
-	IF bStartPulseMem AND fbWritePersistentDataBusyFEdge.Q THEN
-		bStartPulseMem	:=FALSE;
+	IF bInProgress THEN
+		// パターンA: 通常の完了（BUSYが TRUE ➔ FALSE に立ち下がった）
+		IF bWritePersistentDataBusyPrev AND NOT fbWritePersistentData.BUSY THEN
+			bInProgress	:=FALSE;
+			
+			IF fbWritePersistentData.ERR THEN
+				bWritePersistentDataError:=TRUE;
+				bWritePersistentDataErrorID:=fbWritePersistentData.ERRID;
+				fbMessage.CreateEx(stEventEntry:=TC_EVENTS.TkPersistentDataEventClass.PersistentDataWriteError);
+				ipResultMessage:=fbMessage;
+			ELSE
+				bWritePersistentDataDone:=TRUE;
+			END_IF
 		
-		IF NOT fbWritePersistentData.ERR THEN
-			bWritePersistentDataDone:=TRUE;
+		// パターンB: 即時エラー（BUSYが一度もTRUEにならず、ERRだけが上がった）
+		ELSIF fbWritePersistentData.ERR AND NOT fbWritePersistentData.BUSY THEN
+			bInProgress	:=FALSE;
+			bWritePersistentDataError:=TRUE;
+			bWritePersistentDataErrorID:=fbWritePersistentData.ERRID;
+			fbMessage.CreateEx(stEventEntry:=TC_EVENTS.TkPersistentDataEventClass.PersistentDataWriteError);
+			ipResultMessage:=fbMessage;
 		END_IF
-		
 	END_IF
-
-//---パーシステントデータ書き込みFBエラー処理---
-	fbWritePersistentDataErrREdge(CLK:=fbWritePersistentData.ERR);
 	
-	IF fbWritePersistentDataErrREdge.Q THEN
-		bWritePersistentDataError:=TRUE;
-		bWritePersistentDataErrorID:=fbWritePersistentData.ERRID;
-		fbMessage.CreateEx(stEventEntry:=TC_EVENTS.TkPersistentDataEventClass.PersistentDataWriteError);
-		ipResultMessage:=fbMessage;
-		
-	END_IF
+	//次スキャン用に BUSY 状態を記憶
+	bWritePersistentDataBusyPrev:=fbWritePersistentData.BUSY;
 
 ]]></ST>
     </Implementation>
@@ -160,13 +170,7 @@ END_VAR
       <Declaration><![CDATA[METHOD AcknowledgePersistentReset
 ]]></Declaration>
       <Implementation>
-        <ST><![CDATA[//マジックナンバーを正値に修復
-nMagicNumber:=MAGIC_NUMBER_DEFAULT;
-
-//パーシステントデータ保存
-bWriteReq:=TRUE;
-
-//エラーフラグをリセット
+        <ST><![CDATA[//エラーフラグをリセット
 bDataLoadFault		:=FALSE;
 bDataLoadPartial	:=FALSE;
 bOldDataLoad		:=FALSE;
@@ -176,7 +180,12 @@ bMagicMismatch		:=FALSE;
 bPersistentDataLoadError:=FALSE;
 ipResultMessage:=0;
 fbMessage.Release();
-]]></ST>
+
+//マジックナンバーを正値に修復
+nMagicNumber:=MAGIC_NUMBER_DEFAULT;
+
+//パーシステントデータ保存
+bWriteReq:=TRUE;]]></ST>
       </Implementation>
     </Method>
     <Method Name="FB_Init" Id="{e220c860-5388-4521-a00f-ff98ea60f3a2}">
@@ -214,12 +223,27 @@ fbMessage.Release();]]></ST>
     </Method>
     <LineIds Name="FB_PersistentDataManager">
       <LineId Id="409" Count="45" />
-      <LineId Id="457" Count="63" />
+      <LineId Id="457" Count="6" />
+      <LineId Id="521" Count="2" />
+      <LineId Id="526" Count="0" />
+      <LineId Id="528" Count="0" />
+      <LineId Id="527" Count="0" />
+      <LineId Id="525" Count="0" />
+      <LineId Id="524" Count="0" />
+      <LineId Id="465" Count="34" />
+      <LineId Id="531" Count="6" />
+      <LineId Id="547" Count="1" />
+      <LineId Id="538" Count="6" />
+      <LineId Id="549" Count="2" />
+      <LineId Id="546" Count="0" />
+      <LineId Id="529" Count="1" />
+      <LineId Id="500" Count="0" />
+      <LineId Id="552" Count="0" />
+      <LineId Id="519" Count="1" />
       <LineId Id="78" Count="0" />
     </LineIds>
     <LineIds Name="FB_PersistentDataManager.AcknowledgePersistentReset">
-      <LineId Id="1" Count="4" />
-      <LineId Id="10" Count="2" />
+      <LineId Id="11" Count="1" />
       <LineId Id="8" Count="0" />
       <LineId Id="14" Count="0" />
       <LineId Id="13" Count="0" />
@@ -228,6 +252,8 @@ fbMessage.Release();]]></ST>
       <LineId Id="19" Count="0" />
       <LineId Id="18" Count="0" />
       <LineId Id="17" Count="0" />
+      <LineId Id="25" Count="0" />
+      <LineId Id="21" Count="3" />
       <LineId Id="20" Count="0" />
     </LineIds>
     <LineIds Name="FB_PersistentDataManager.FB_Init">
