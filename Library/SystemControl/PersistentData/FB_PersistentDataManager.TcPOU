@@ -178,8 +178,8 @@ bMagicMismatch		:=FALSE;
 
 //エラー出力をリセット
 bPersistentDataLoadError:=FALSE;
-ipResultMessage:=0;
 fbMessage.Release();
+ipResultMessage:=0;
 
 //マジックナンバーを正値に修復
 nMagicNumber:=MAGIC_NUMBER_DEFAULT;
@@ -217,8 +217,8 @@ END_VAR]]></Declaration>
         <ST><![CDATA[//エラー出力をリセット
 bWritePersistentDataError:=FALSE;
 bWritePersistentDataErrorID:=0;
-ipResultMessage:=0;
-fbMessage.Release();]]></ST>
+fbMessage.Release();
+ipResultMessage:=0;]]></ST>
       </Implementation>
     </Method>
     <LineIds Name="FB_PersistentDataManager">
@@ -250,8 +250,8 @@ fbMessage.Release();]]></ST>
       <LineId Id="16" Count="0" />
       <LineId Id="15" Count="0" />
       <LineId Id="19" Count="0" />
+      <LineId Id="26" Count="0" />
       <LineId Id="18" Count="0" />
-      <LineId Id="17" Count="0" />
       <LineId Id="25" Count="0" />
       <LineId Id="21" Count="3" />
       <LineId Id="20" Count="0" />
@@ -264,8 +264,8 @@ fbMessage.Release();]]></ST>
     </LineIds>
     <LineIds Name="FB_PersistentDataManager.ResetError">
       <LineId Id="11" Count="2" />
+      <LineId Id="16" Count="0" />
       <LineId Id="3" Count="0" />
-      <LineId Id="15" Count="0" />
     </LineIds>
   </POU>
 </TcPlcObject>
