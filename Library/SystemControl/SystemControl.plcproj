@@ -9,7 +9,7 @@
     <WriteProductVersion>false</WriteProductVersion>
     <GenerateTpy>false</GenerateTpy>
     <Name>SystemControl</Name>
-    <ProgramVersion>3.1.4026.25</ProgramVersion>
+    <ProgramVersion>3.1.4026.26</ProgramVersion>
     <Application>{7d507291-f740-4db2-8836-2bf3850a1e2b}</Application>
     <TypeSystem>{236b3e93-d1ba-4c63-9597-60b92111fbb8}</TypeSystem>
     <Implicit_Task_Info>{383cd175-6048-4413-816e-a3ae69d7b57b}</Implicit_Task_Info>
@@ -45,7 +45,10 @@
   </PropertyGroup>
   <ItemGroup>
     <Folder Include="PcPower" />
-    <Folder Include="PcPower\1sUPS" />
+    <Folder Include="PcPower\1s_UPS" />
+    <Folder Include="PcPower\UPS" />
+    <Folder Include="PcPower\[obsolete]" />
+    <Folder Include="PcPower\[obsolete]\1sUPS" />
     <Folder Include="PersistentData" />
     <Folder Include="PersistentData\[obsolete]" />
     <Folder Include="Version" />
@@ -78,16 +81,37 @@
     </PlaceholderReference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="PcPower\1sUPS\FB_1sUPS_BAPI.TcPOU">
+    <Compile Include="PcPower\1s_UPS\FB_1s_UPS_BAPI.TcPOU">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="PcPower\1sUPS\FB_1sUPS_CX81xx.TcPOU">
+    <Compile Include="PcPower\1s_UPS\FB_1s_UPS_Base.TcPOU">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="PcPower\1sUPS\i1sUPS.TcIO">
+    <Compile Include="PcPower\1s_UPS\FB_1s_UPS_CX81xx.TcPOU">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="PcPower\FB_PcPowerManagement.TcPOU">
+    <Compile Include="PcPower\1s_UPS\I_1s_UPS.TcIO">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="PcPower\FB_PcShutdownController.TcPOU">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="PcPower\note.TcPOU">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="PcPower\UPS\I_UPS.TcIO">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="PcPower\[obsolete]\1sUPS\FB_1sUPS_BAPI.TcPOU">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="PcPower\[obsolete]\1sUPS\FB_1sUPS_CX81xx.TcPOU">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="PcPower\[obsolete]\1sUPS\i1sUPS.TcIO">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="PcPower\[obsolete]\FB_PcPowerManagement.TcPOU">
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="PersistentData\FB_PersistentDataManager.TcPOU">

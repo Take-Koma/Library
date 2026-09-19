@@ -1,0 +1,53 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1">
+  <POU Name="FB_1s_UPS_CX81xx" Id="{6db4d870-6a02-4ac1-a8a5-78cdcd1ec77b}" SpecialFunc="None">
+    <Declaration><![CDATA[FUNCTION_BLOCK FB_1s_UPS_CX81xx EXTENDS FB_1s_UPS_Base
+VAR
+	fb1sUps		:FB_S_UPS_CX81xx;
+END_VAR]]></Declaration>
+    <Implementation>
+      <ST><![CDATA[]]></ST>
+    </Implementation>
+    <Property Name="bReady" Id="{f0c43278-114c-4db3-b491-3def8dcf9c49}">
+      <Declaration><![CDATA[{warning 'Add property implementation'}
+PROPERTY bReady : BOOL
+]]></Declaration>
+      <Get Name="Get" Id="{0d58028d-4079-4649-a1fd-c30b273628ff}">
+        <Declaration><![CDATA[VAR
+END_VAR
+]]></Declaration>
+        <Implementation>
+          <ST><![CDATA[SUPER^._bReady:= fb1sUps.eState=E_S_UPS_State.eSUPS_PowerOK;
+
+bReady:=SUPER^._bReady;]]></ST>
+        </Implementation>
+      </Get>
+    </Property>
+    <Method Name="Execute" Id="{9de32de7-47a1-4fe3-b580-902cc5aa809e}">
+      <Declaration><![CDATA[METHOD Execute
+VAR_INPUT
+	PcAmsNetId	: AMSNETID;		//PC AMS Net ID
+END_VAR]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[fb1sUps(sNetID				:=F_CreateAmsNetId(PcAmsNetId),
+		iPLCPort			:=_AppInfo.AdsPort,
+		tTimeout			:=DEFAULT_ADS_TIMEOUT,
+		eUpsMode			:=E_S_UPS_Mode.eSUPS_WrPersistData_Shutdown,
+		ePersistentMode		:=E_PersistentMode.SPDM_2PASS,
+		tRecoverTime		:=T#10S,
+		bPowerFailDetect	=>SUPER^._bPowerFailDetect,
+		eState				=>SUPER^._e1sUpsState
+		);]]></ST>
+      </Implementation>
+    </Method>
+    <LineIds Name="FB_1s_UPS_CX81xx">
+      <LineId Id="1" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_1s_UPS_CX81xx.bReady.Get">
+      <LineId Id="1" Count="2" />
+    </LineIds>
+    <LineIds Name="FB_1s_UPS_CX81xx.Execute">
+      <LineId Id="1" Count="8" />
+    </LineIds>
+  </POU>
+</TcPlcObject>

@@ -1,0 +1,82 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1">
+  <POU Name="FB_1s_UPS_Base" Id="{d307deb9-28d5-4c30-a4c8-246804a0b876}" SpecialFunc="None">
+    <Declaration><![CDATA[FUNCTION_BLOCK FB_1s_UPS_Base IMPLEMENTS I_1s_UPS
+VAR
+	_bReady					:BOOL;				//電源供給あり
+	_e1sUpsState			:E_S_UPS_State;		//1s UPSのステータス
+	
+	{attribute 'TcPersistent'}
+	_bPowerFailDetect		:BOOL;				//停電検知記憶
+END_VAR
+]]></Declaration>
+    <Implementation>
+      <ST><![CDATA[]]></ST>
+    </Implementation>
+    <Property Name="bPowerFailDetect" Id="{71da8cbe-9842-47a2-b993-f0955e0350af}">
+      <Declaration><![CDATA[{warning 'Add property implementation'}
+PROPERTY bPowerFailDetect : BOOL
+]]></Declaration>
+      <Get Name="Get" Id="{a0dc9dff-8cbd-47a0-8567-b0e57c85eec9}">
+        <Declaration><![CDATA[VAR
+END_VAR
+]]></Declaration>
+        <Implementation>
+          <ST><![CDATA[bPowerFailDetect:=_bPowerFailDetect;]]></ST>
+        </Implementation>
+      </Get>
+    </Property>
+    <Property Name="bReady" Id="{c9df24a0-69f7-4985-a7ed-3cf593322957}">
+      <Declaration><![CDATA[{warning 'Add property implementation'}
+PROPERTY bReady : BOOL
+]]></Declaration>
+      <Get Name="Get" Id="{c195ff3a-f52c-47ac-848c-7b1555f6bd0f}">
+        <Declaration><![CDATA[VAR
+END_VAR
+]]></Declaration>
+        <Implementation>
+          <ST><![CDATA[bReady:=_bReady;]]></ST>
+        </Implementation>
+      </Get>
+    </Property>
+    <Property Name="e1sUpsState" Id="{009aae78-1ffe-46fe-902a-191b0bf6d8ee}">
+      <Declaration><![CDATA[{warning 'Add property implementation'}
+PROPERTY e1sUpsState : E_S_UPS_State
+]]></Declaration>
+      <Get Name="Get" Id="{9fa6c78a-2452-448b-b165-39d017a0e4be}">
+        <Declaration><![CDATA[VAR
+END_VAR
+]]></Declaration>
+        <Implementation>
+          <ST><![CDATA[e1sUpsState:=_e1sUpsState;]]></ST>
+        </Implementation>
+      </Get>
+    </Property>
+    <Method Name="Execute" Id="{9865cb07-5bf9-4cf4-87ed-c272c1d78e85}">
+      <Declaration><![CDATA[{warning 'Add method implementation '}
+METHOD Execute
+VAR_INPUT
+	PcAmsNetId	: AMSNETID;		//PC AMS Net ID
+END_VAR
+]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[]]></ST>
+      </Implementation>
+    </Method>
+    <LineIds Name="FB_1s_UPS_Base">
+      <LineId Id="1" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_1s_UPS_Base.bPowerFailDetect.Get">
+      <LineId Id="1" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_1s_UPS_Base.bReady.Get">
+      <LineId Id="1" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_1s_UPS_Base.e1sUpsState.Get">
+      <LineId Id="1" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_1s_UPS_Base.Execute">
+      <LineId Id="1" Count="0" />
+    </LineIds>
+  </POU>
+</TcPlcObject>

@@ -1,0 +1,62 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1">
+  <POU Name="FB_1s_UPS_BAPI" Id="{0be639e9-85f4-4d15-a6ba-bebd7c0856d3}" SpecialFunc="None">
+    <Declaration><![CDATA[FUNCTION_BLOCK FB_1s_UPS_BAPI EXTENDS FB_1s_UPS_Base
+VAR CONSTANT
+	nOkCapacityLevel	:BYTE	:=90;
+END_VAR
+VAR
+	fb1sUps				:FB_S_UPS_BAPI;
+END_VAR
+]]></Declaration>
+    <Implementation>
+      <ST><![CDATA[]]></ST>
+    </Implementation>
+    <Property Name="bReady" Id="{e1a89f9a-8df1-44d5-ba18-92104e1c8016}">
+      <Declaration><![CDATA[{warning 'Add property implementation'}
+PROPERTY bReady : BOOL
+]]></Declaration>
+      <Get Name="Get" Id="{3eb18884-281a-401a-96ba-f9383ec34a45}">
+        <Declaration><![CDATA[VAR
+END_VAR
+]]></Declaration>
+        <Implementation>
+          <ST><![CDATA[SUPER^._bReady:=(fb1sUps.eState=E_S_UPS_State.eSUPS_PowerOK) AND (nOkCapacityLevel<fb1sUps.nCapacity) AND (fb1sUps.bError=FALSE);
+
+bReady:= SUPER^._bReady;]]></ST>
+        </Implementation>
+      </Get>
+    </Property>
+    <Method Name="Execute" Id="{3a7e3fc0-6360-4943-bda6-d23d23697136}">
+      <Declaration><![CDATA[METHOD Execute
+VAR_INPUT
+	PcAmsNetId	: AMSNETID;		//PC AMS Net ID
+END_VAR
+]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[fb1sUps(sNetID				:=F_CreateAmsNetId(PcAmsNetId),
+		iPLCPort			:=_AppInfo.AdsPort,
+		tTimeout			:=DEFAULT_ADS_TIMEOUT,
+		eUpsMode			:=E_S_UPS_Mode.eSUPS_WrPersistData_Shutdown,
+		ePersistentMode		:=E_PersistentMode.SPDM_2PASS,
+		tRecoverTime		:=T#10S,
+		bPowerFailDetect	=>SUPER^._bPowerFailDetect,
+		eState				=>SUPER^._e1sUpsState,
+		nCapacity			=>,
+		bBusy				=>,
+		bError				=>,
+		nErrID				=>
+		);]]></ST>
+      </Implementation>
+    </Method>
+    <LineIds Name="FB_1s_UPS_BAPI">
+      <LineId Id="1" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_1s_UPS_BAPI.bReady.Get">
+      <LineId Id="1" Count="2" />
+    </LineIds>
+    <LineIds Name="FB_1s_UPS_BAPI.Execute">
+      <LineId Id="1" Count="12" />
+    </LineIds>
+  </POU>
+</TcPlcObject>

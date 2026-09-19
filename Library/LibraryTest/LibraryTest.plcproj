@@ -9,7 +9,7 @@
     <WriteProductVersion>false</WriteProductVersion>
     <GenerateTpy>false</GenerateTpy>
     <Name>LibraryTest</Name>
-    <ProgramVersion>3.1.4026.25</ProgramVersion>
+    <ProgramVersion>3.1.4026.26</ProgramVersion>
     <Application>{40593fa7-98ee-41a4-a8cc-3ef1b71e2e3a}</Application>
     <TypeSystem>{f7cd42cf-5b5e-43b3-811f-11a25871e9fe}</TypeSystem>
     <Implicit_Task_Info>{68e51a20-b901-49a8-939a-b110d2de4582}</Implicit_Task_Info>

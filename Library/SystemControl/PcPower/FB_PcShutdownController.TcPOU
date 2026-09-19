@@ -1,0 +1,202 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1">
+  <POU Name="FB_PcShutdownController" Id="{5e504a49-c237-497e-bcc9-96deff8313f6}" SpecialFunc="None">
+    <Declaration><![CDATA[FUNCTION_BLOCK FB_PcShutdownController
+VAR_INPUT
+END_VAR
+VAR_OUTPUT
+END_VAR
+VAR
+//---FB_Initで受け取り---
+	_pPersistentDataManager		:POINTER TO FB_PersistentDataManager;		//パーシステントデータ書き込み
+	_PcAmsNetId					:AMSNETID;									//PC AMS Net ID	
+
+//---内部使用FB---
+	fbPlcStop					:PLC_Stop		:=(Stop:=FALSE);			//PLCストップ
+	fbNtShutdown				:NT_Shutdown	:=(START:=FALSE);			//PCシャットダウン
+	fbNtReboot					:NT_Reboot		:=(START:=FALSE);			//PCリブート
+
+	fbRebootTon					:TON			:=(PT:=T#2S);
+	fbShutdownTon				:TON			:=(PT:=T#2S);
+	
+//---内部変数---
+	iStep						:INT			:=0;						//シャットダウン、リブート制御step
+	_bError						:BOOL;
+	_bReboot					:BOOL;
+	_bShutdown					:BOOL;
+END_VAR
+
+]]></Declaration>
+    <Implementation>
+      <ST><![CDATA[]]></ST>
+    </Implementation>
+    <Property Name="bError" Id="{2b3c858b-7971-4352-a5d1-6f1fe3c22d3c}">
+      <Declaration><![CDATA[PROPERTY bError : BOOL]]></Declaration>
+      <Get Name="Get" Id="{505c4ddd-37bc-4ef5-9b1f-5b3a623797b9}">
+        <Declaration><![CDATA[VAR
+END_VAR
+]]></Declaration>
+        <Implementation>
+          <ST><![CDATA[bError:=_bError;
+]]></ST>
+        </Implementation>
+      </Get>
+    </Property>
+    <Method Name="Execute" Id="{4fd55cde-97bb-4513-9a23-1b9ca06181b8}">
+      <Declaration><![CDATA[METHOD Execute
+
+]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[//---タイマーFB呼び出し---
+	fbRebootTon(IN:=_bReboot AND iStep=0 );
+	fbShutdownTon(IN:=_bShutdown AND iStep=0 );
+
+
+
+//---パーシステントデータ保存FBのポインターチェック---
+	IF _pPersistentDataManager=0 THEN
+		_bError:=TRUE;
+		iStep:=0;
+	END_IF	
+
+
+
+//---制御step---
+	CASE iStep OF
+		0:
+			//待機
+			
+		10:				
+			IF fbRebootTon.Q OR fbShutdownTon.Q THEN
+				_pPersistentDataManager^.RequestWrite();
+				iStep:=20;
+				
+			END_IF
+	
+		20:
+			IF _pPersistentDataManager^.bWritePersistentDataDone THEN
+				iStep:=30;
+			ELSIF _pPersistentDataManager^.bWritePersistentDataError THEN
+				_bError:=TRUE;
+				iStep:=0;
+			END_IF
+		
+		30:
+			fbPlcStop(	NETID	:=F_CreateAmsNetId(_PcAmsNetId),
+						PORT	:=_AppInfo.AdsPort,
+						Stop	:=_bReboot OR _bShutdown,
+						TMOUT	:=DEFAULT_ADS_TIMEOUT,
+						BUSY	=>,
+						ERR		=>,
+						ERRID	=>
+						);
+		
+			fbNtReboot(	NETID	:=F_CreateAmsNetId(_PcAmsNetId),
+						DELAY	:=1,
+						START	:=_bReboot,
+						TMOUT	:=DEFAULT_ADS_TIMEOUT,
+						BUSY	=>,
+						ERR		=>,
+						ERRID	=>
+						);
+		
+			fbNtShutdown(	NETID	:=F_CreateAmsNetId(_PcAmsNetId),
+							DELAY	:=1,
+							START	:=_bShutdown,
+							TMOUT	:=DEFAULT_ADS_TIMEOUT,
+							BUSY	=>,
+							ERR		=>,
+							ERRID	=>
+							);
+	
+	END_CASE
+
+
+	]]></ST>
+      </Implementation>
+    </Method>
+    <Method Name="FB_Init" Id="{4005cfe3-fa1e-4032-9be6-3c796e610e47}">
+      <Declaration><![CDATA[//FB_Init は常に暗黙的に使用可能で、主に初期化に使用されます。
+//戻り値は評価されません。特定の結果を得るために、メソッドを明示的に宣言し、
+//そのメソッドに標準の初期化コードをもったコードを追加することができます。戻り値を評価できます。
+METHOD FB_Init: BOOL
+VAR_INPUT
+    bInitRetains: BOOL; // TRUE: 保持変数は初期化されます (ウォーム リセット、あるいはコールド リセット)
+    bInCopyCode: BOOL;  // TRUE: 後でコードをコピーする (オンライン変更) ために、インスタンスをコピーします。
+
+    pPersistentDataManager		:POINTER TO FB_PersistentDataManager;
+	PcAmsNetId					:AMSNETID;		//PC AMS Net ID
+END_VAR]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[_pPersistentDataManager := ADR(pPersistentDataManager);
+
+_PcAmsNetId:=PcAmsNetId;]]></ST>
+      </Implementation>
+    </Method>
+    <Method Name="RequestReboot" Id="{040fb411-3506-4400-b738-13ce029cde64}">
+      <Declaration><![CDATA[METHOD  RequestReboot: BOOL
+VAR_INPUT
+	bReboot	:bool;
+END_VAR
+]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[IF bReboot THEN
+	iStep:=10;
+	RequestReboot:=TRUE;
+ELSE
+	iStep:=0;
+	RequestReboot:=FALSE;
+END_IF
+
+			
+
+]]></ST>
+      </Implementation>
+    </Method>
+    <Method Name="RequestShutdown" Id="{c5c3a239-8c6b-4842-92ba-8cd5267593c6}">
+      <Declaration><![CDATA[METHOD RequestShutdown: BOOL
+VAR_INPUT
+	bShutdown	:BOOL;
+END_VAR
+]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[IF bShutdown THEN
+	iStep:=10;
+	RequestShutdown:=TRUE;
+ELSE
+	iStep:=0;
+	RequestShutdown:=FALSE;
+END_IF]]></ST>
+      </Implementation>
+    </Method>
+    <LineIds Name="FB_PcShutdownController">
+      <LineId Id="2" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_PcShutdownController.bError.Get">
+      <LineId Id="1" Count="1" />
+    </LineIds>
+    <LineIds Name="FB_PcShutdownController.Execute">
+      <LineId Id="1" Count="65" />
+    </LineIds>
+    <LineIds Name="FB_PcShutdownController.FB_Init">
+      <LineId Id="1" Count="2" />
+    </LineIds>
+    <LineIds Name="FB_PcShutdownController.RequestReboot">
+      <LineId Id="51" Count="0" />
+      <LineId Id="55" Count="0" />
+      <LineId Id="57" Count="1" />
+      <LineId Id="60" Count="0" />
+      <LineId Id="59" Count="0" />
+      <LineId Id="56" Count="0" />
+      <LineId Id="52" Count="2" />
+      <LineId Id="1" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_PcShutdownController.RequestShutdown">
+      <LineId Id="1" Count="1" />
+      <LineId Id="4" Count="1" />
+      <LineId Id="7" Count="0" />
+      <LineId Id="6" Count="0" />
+      <LineId Id="3" Count="0" />
+    </LineIds>
+  </POU>
+</TcPlcObject>

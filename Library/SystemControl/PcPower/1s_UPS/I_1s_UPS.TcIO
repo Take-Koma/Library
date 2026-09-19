@@ -1,0 +1,32 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1">
+  <Itf Name="I_1s_UPS" Id="{b4b1b3e2-fd93-4da2-92d1-453053502d99}">
+    <Declaration><![CDATA[INTERFACE I_1s_UPS
+]]></Declaration>
+    <Property Name="bPowerFailDetect" Id="{f8195a76-69b2-4f5a-93ed-cdcdf49a6394}">
+      <Declaration><![CDATA[PROPERTY bPowerFailDetect : BOOL]]></Declaration>
+      <Get Name="Get" Id="{92afdf7f-c298-4063-8ff0-c74db2a46fee}">
+        <Declaration><![CDATA[]]></Declaration>
+      </Get>
+    </Property>
+    <Property Name="bReady" Id="{292eb10e-6971-487f-b74b-4f1aecf9e276}">
+      <Declaration><![CDATA[PROPERTY bReady : BOOL]]></Declaration>
+      <Get Name="Get" Id="{262507eb-21c3-483f-bf8c-4fcfa1cb1278}">
+        <Declaration><![CDATA[]]></Declaration>
+      </Get>
+    </Property>
+    <Property Name="e1sUpsState" Id="{a73a48bb-8a97-4702-94a0-6f8e82e8979f}">
+      <Declaration><![CDATA[PROPERTY e1sUpsState : E_S_UPS_State]]></Declaration>
+      <Get Name="Get" Id="{bdd0a802-9e7f-4583-9abb-873005299db7}">
+        <Declaration><![CDATA[]]></Declaration>
+      </Get>
+    </Property>
+    <Method Name="Execute" Id="{37908e70-6383-4f51-be8a-bdb845ca805c}">
+      <Declaration><![CDATA[METHOD Execute
+VAR_INPUT
+	PcAmsNetId	: AMSNETID;		//PC AMS Net ID
+END_VAR
+]]></Declaration>
+    </Method>
+  </Itf>
+</TcPlcObject>
