@@ -9,7 +9,7 @@
     <WriteProductVersion>false</WriteProductVersion>
     <GenerateTpy>false</GenerateTpy>
     <Name>DiagnosisIOLinkMaster</Name>
-    <ProgramVersion>3.1.4026.25</ProgramVersion>
+    <ProgramVersion>3.1.4026.26</ProgramVersion>
     <Application>{24aef8c6-c491-4657-8dff-592503e9b979}</Application>
     <TypeSystem>{2c62e7f8-b85a-4451-a516-8e8f4c57675a}</TypeSystem>
     <Implicit_Task_Info>{c6704d16-2257-4add-9b15-eeb27bb0567b}</Implicit_Task_Info>
@@ -37,7 +37,7 @@
       <Id xmlns="">{a30025f5-4ecd-4f26-adb5-172022701ca1}</Id>
     </SelectedLibraryCategories>
     <Author>TK</Author>
-    <ProjectVersion>0.0.2.0</ProjectVersion>
+    <ProjectVersion>0.0.2.1</ProjectVersion>
     <Title>Tk_Diagnosis_IO-LinkMaster</Title>
     <GlobalVersionStructureIncluded>true</GlobalVersionStructureIncluded>
     <Description>Beckhoff製IO-LinkマスターEL6224診断用FBのライブラリです。 </Description>
@@ -89,8 +89,8 @@
   <ProjectExtensions>
     <PlcProjectOptions>
       <XmlArchive>
-  <Data>
-    <o xml:space="preserve" t="OptionKey">
+        <Data>
+          <o xml:space="preserve" t="OptionKey">
       <v n="Name">"&lt;ProjectRoot&gt;"</v>
       <d n="SubKeys" t="Hashtable" ckt="String" cvt="OptionKey">
         <v>{192FAD59-8248-4824-A8DE-9177C94C195A}</v>
@@ -166,14 +166,14 @@
       </d>
       <d n="Values" t="Hashtable" />
     </o>
-  </Data>
-  <TypeList>
-    <Type n="Boolean">System.Boolean</Type>
-    <Type n="Hashtable">System.Collections.Hashtable</Type>
-    <Type n="OptionKey">{54dd0eac-a6d8-46f2-8c27-2f43c7e49861}</Type>
-    <Type n="String">System.String</Type>
-  </TypeList>
-</XmlArchive>
+        </Data>
+        <TypeList>
+          <Type n="Boolean">System.Boolean</Type>
+          <Type n="Hashtable">System.Collections.Hashtable</Type>
+          <Type n="OptionKey">{54dd0eac-a6d8-46f2-8c27-2f43c7e49861}</Type>
+          <Type n="String">System.String</Type>
+        </TypeList>
+      </XmlArchive>
     </PlcProjectOptions>
   </ProjectExtensions>
 </Project>
