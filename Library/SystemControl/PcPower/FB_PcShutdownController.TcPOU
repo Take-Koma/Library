@@ -2,10 +2,6 @@
 <TcPlcObject Version="1.1.0.1">
   <POU Name="FB_PcShutdownController" Id="{5e504a49-c237-497e-bcc9-96deff8313f6}" SpecialFunc="None">
     <Declaration><![CDATA[FUNCTION_BLOCK FB_PcShutdownController
-VAR_INPUT
-END_VAR
-VAR_OUTPUT
-END_VAR
 VAR
 //---FB_Initで受け取り---
 	_pPersistentDataManager		:POINTER TO FB_PersistentDataManager;		//パーシステントデータ書き込み
@@ -58,21 +54,18 @@ END_VAR
 
 
 //---タイマーFB呼び出し---
-	fbRebootTon(IN:=_bReboot AND NOT _bShutdown );
-	fbShutdownTon(IN:=_bShutdown AND NOT _bReboot );
-
-	IF fbRebootTon.Q OR fbShutdownTon.Q THEN
-		iStep:=10;
-		
-	END_IF
-
+	fbRebootTon(IN:=_bReboot AND NOT _bShutdown AND NOT _bError );
+	fbShutdownTon(IN:=_bShutdown AND NOT _bReboot AND NOT _bError );
 
 
 
 //---制御step---
 	CASE iStep OF
 		0:
-			//待機
+			IF fbRebootTon.Q OR fbShutdownTon.Q THEN
+				iStep:=10;
+				
+			END_IF
 			
 		10:				
 			_pPersistentDataManager^.RequestWrite();
@@ -87,14 +80,15 @@ END_VAR
 			END_IF
 		
 		30:
-			fbPlcStop(	NETID	:=F_CreateAmsNetId(_PcAmsNetId),
-						PORT	:=_AppInfo.AdsPort,
+		(*	fbPlcStop(	NETID	:=F_CreateAmsNetId(_PcAmsNetId),
+						PORT	:=TwinCAT_SystemInfoVarList._AppInfo.AdsPort,
 						Stop	:=_bReboot OR _bShutdown,
 						TMOUT	:=DEFAULT_ADS_TIMEOUT,
 						BUSY	=>,
 						ERR		=>,
 						ERRID	=>
 						);
+		*)
 		
 			fbNtReboot(	NETID	:=F_CreateAmsNetId(_PcAmsNetId),
 						DELAY	:=1,
@@ -142,12 +136,12 @@ _PcAmsNetId:=PcAmsNetId;]]></ST>
     <Method Name="RequestReboot" Id="{040fb411-3506-4400-b738-13ce029cde64}">
       <Declaration><![CDATA[METHOD  RequestReboot: BOOL
 VAR_INPUT
-	bReboot	:bool;
+	bExecute	:bool;
 END_VAR
 ]]></Declaration>
       <Implementation>
-        <ST><![CDATA[_bReboot		:=bReboot;
-RequestReboot	:=bReboot;
+        <ST><![CDATA[_bReboot		:=bExecute;
+RequestReboot	:=bExecute;
 
 
 			
@@ -158,14 +152,23 @@ RequestReboot	:=bReboot;
     <Method Name="RequestShutdown" Id="{c5c3a239-8c6b-4842-92ba-8cd5267593c6}">
       <Declaration><![CDATA[METHOD RequestShutdown: BOOL
 VAR_INPUT
-	bShutdown	:BOOL;
+	bExecute	:BOOL;
 END_VAR
 ]]></Declaration>
       <Implementation>
-        <ST><![CDATA[_bShutdown			:=bShutdown;
-RequestShutdown		:=bShutdown;
+        <ST><![CDATA[_bShutdown			:=bExecute;
+RequestShutdown		:=bExecute;
 
 
+]]></ST>
+      </Implementation>
+    </Method>
+    <Method Name="ResetError" Id="{e92edee7-e4c1-41c4-9428-960b4d095665}">
+      <Declaration><![CDATA[METHOD ResetError
+]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[//エラー出力をリセット
+_bError:=FALSE;
 ]]></ST>
       </Implementation>
     </Method>
@@ -176,7 +179,7 @@ RequestShutdown		:=bShutdown;
       <LineId Id="1" Count="1" />
     </LineIds>
     <LineIds Name="FB_PcShutdownController.Execute">
-      <LineId Id="1" Count="71" />
+      <LineId Id="1" Count="69" />
     </LineIds>
     <LineIds Name="FB_PcShutdownController.FB_Init">
       <LineId Id="1" Count="2" />
@@ -193,6 +196,9 @@ RequestShutdown		:=bShutdown;
       <LineId Id="4" Count="0" />
       <LineId Id="9" Count="1" />
       <LineId Id="3" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_PcShutdownController.ResetError">
+      <LineId Id="1" Count="2" />
     </LineIds>
   </POU>
 </TcPlcObject>

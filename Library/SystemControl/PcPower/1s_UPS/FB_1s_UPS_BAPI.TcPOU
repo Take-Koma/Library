@@ -12,51 +12,39 @@ END_VAR
     <Implementation>
       <ST><![CDATA[]]></ST>
     </Implementation>
-    <Property Name="bReady" Id="{e1a89f9a-8df1-44d5-ba18-92104e1c8016}">
-      <Declaration><![CDATA[{warning 'Add property implementation'}
-PROPERTY bReady : BOOL
-]]></Declaration>
-      <Get Name="Get" Id="{3eb18884-281a-401a-96ba-f9383ec34a45}">
-        <Declaration><![CDATA[VAR
-END_VAR
-]]></Declaration>
-        <Implementation>
-          <ST><![CDATA[SUPER^._bReady:=(fb1sUps.eState=E_S_UPS_State.eSUPS_PowerOK) AND (nOkCapacityLevel<fb1sUps.nCapacity) AND (fb1sUps.bError=FALSE);
-
-bReady:= SUPER^._bReady;]]></ST>
-        </Implementation>
-      </Get>
-    </Property>
     <Method Name="Execute" Id="{3a7e3fc0-6360-4943-bda6-d23d23697136}">
       <Declaration><![CDATA[METHOD Execute
-VAR_INPUT
-	PcAmsNetId	: AMSNETID;		//PC AMS Net ID
-END_VAR
+
 ]]></Declaration>
       <Implementation>
-        <ST><![CDATA[fb1sUps(sNetID				:=F_CreateAmsNetId(PcAmsNetId),
-		iPLCPort			:=_AppInfo.AdsPort,
+        <ST><![CDATA[fb1sUps(sNetID				:=F_CreateAmsNetId(_PcAmsNetId),
+		iPLCPort			:=TwinCAT_SystemInfoVarList._AppInfo.AdsPort,
 		tTimeout			:=DEFAULT_ADS_TIMEOUT,
 		eUpsMode			:=E_S_UPS_Mode.eSUPS_WrPersistData_Shutdown,
 		ePersistentMode		:=E_PersistentMode.SPDM_2PASS,
 		tRecoverTime		:=T#10S,
-		bPowerFailDetect	=>SUPER^._bPowerFailDetect,
+		bPowerFailDetect	=>,
 		eState				=>SUPER^._e1sUpsState,
 		nCapacity			=>,
 		bBusy				=>,
 		bError				=>,
 		nErrID				=>
-		);]]></ST>
+		);
+		
+IF fb1sUps.bPowerFailDetect THEN
+	SUPER^._bPowerFailDetect:=TRUE;
+END_IF
+
+SUPER^._bReady:=(fb1sUps.eState=E_S_UPS_State.eSUPS_PowerOK) AND (nOkCapacityLevel<fb1sUps.nCapacity) AND (fb1sUps.bError=FALSE);]]></ST>
       </Implementation>
     </Method>
     <LineIds Name="FB_1s_UPS_BAPI">
       <LineId Id="1" Count="0" />
     </LineIds>
-    <LineIds Name="FB_1s_UPS_BAPI.bReady.Get">
-      <LineId Id="1" Count="2" />
-    </LineIds>
     <LineIds Name="FB_1s_UPS_BAPI.Execute">
-      <LineId Id="1" Count="12" />
+      <LineId Id="1" Count="16" />
+      <LineId Id="19" Count="0" />
+      <LineId Id="18" Count="0" />
     </LineIds>
   </POU>
 </TcPlcObject>

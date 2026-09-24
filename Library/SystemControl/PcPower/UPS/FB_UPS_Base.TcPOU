@@ -1,0 +1,125 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1">
+  <POU Name="FB_UPS_Base" Id="{f23ce3fc-9883-47bd-9471-fc14b89fac1d}" SpecialFunc="None">
+    <Declaration><![CDATA[FUNCTION_BLOCK FB_UPS_Base IMPLEMENTS I_UPS
+VAR
+	_PcAmsNetId				:AMSNETID;			//PC AMS Net ID	
+	
+	_bReady					:BOOL;				//電源供給あり
+	_bReplaceBattery		:BOOL;				//バッテリー寿命・交換警告
+	
+	_nBatteryPercent		:DWORD;				//バッテリー残量 (0-100%)
+	
+	{attribute 'TcPersistent'}
+	_bPowerFailDetect		:BOOL;				//停電検知記憶
+END_VAR
+]]></Declaration>
+    <Implementation>
+      <ST><![CDATA[]]></ST>
+    </Implementation>
+    <Method Name="AcknowledgePowerFailDetect" Id="{40a86b70-6eea-4cb0-a8d2-07e6703a2fd5}">
+      <Declaration><![CDATA[METHOD AcknowledgePowerFailDetect
+]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[_bPowerFailDetect:=FALSE;]]></ST>
+      </Implementation>
+    </Method>
+    <Property Name="bPowerFailDetect" Id="{6e21af1b-1c3a-4806-b531-4d0e0e9cc211}">
+      <Declaration><![CDATA[PROPERTY bPowerFailDetect : BOOL
+]]></Declaration>
+      <Get Name="Get" Id="{e2488c9f-ea93-4f60-bca0-036f311ca3b9}">
+        <Declaration><![CDATA[VAR
+END_VAR
+]]></Declaration>
+        <Implementation>
+          <ST><![CDATA[bPowerFailDetect:=_bPowerFailDetect;]]></ST>
+        </Implementation>
+      </Get>
+    </Property>
+    <Property Name="bReady" Id="{abd2a057-7ea6-41d5-9b5a-dcd94c58d509}">
+      <Declaration><![CDATA[PROPERTY bReady : BOOL
+]]></Declaration>
+      <Get Name="Get" Id="{b79560f2-188a-4305-89d8-e4d240d0e550}">
+        <Declaration><![CDATA[VAR
+END_VAR
+]]></Declaration>
+        <Implementation>
+          <ST><![CDATA[bReady:=_bReady;]]></ST>
+        </Implementation>
+      </Get>
+    </Property>
+    <Property Name="bReplaceBattery" Id="{9e135114-1d16-4359-87ba-8b02ee697c8f}">
+      <Declaration><![CDATA[PROPERTY bReplaceBattery : BOOL
+]]></Declaration>
+      <Get Name="Get" Id="{5ac8c9b8-6b34-4deb-a7c5-f9b5db77d5b4}">
+        <Declaration><![CDATA[VAR
+END_VAR
+]]></Declaration>
+        <Implementation>
+          <ST><![CDATA[bReplaceBattery:=_bReplaceBattery;]]></ST>
+        </Implementation>
+      </Get>
+    </Property>
+    <Method Name="Execute" Id="{581f6771-0bce-46c8-99b8-d07fc518da9c}">
+      <Declaration><![CDATA[METHOD Execute
+]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[]]></ST>
+      </Implementation>
+    </Method>
+    <Method Name="FB_Init" Id="{ab4d071e-ed22-40b1-9d69-c3c9e242fc94}">
+      <Declaration><![CDATA[(*FB_Init は常に暗黙的に使用可能で、主に初期化に使用されます。
+戻り値は評価されません。特定の結果を得るために、メソッドを明示的に宣言し、
+そのメソッドに標準の初期化コードをもったコードを追加することができます。戻り値を評価できます。*)
+METHOD FB_Init : BOOL
+VAR_INPUT
+	(* TRUE: 保持変数は初期化されます (ウォーム リセット、あるいはコールド リセット)*)
+	bInitRetains	: BOOL;
+	(* TRUE: 後でコードをコピーする (オンライン変更) ために、インスタンスをコピーします。*)
+	bInCopyCode	: BOOL;
+	(*PC AMS Net ID*)
+	PcAmsNetId	: AMSNETID;
+END_VAR
+]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[_PcAmsNetId:=PcAmsNetId;]]></ST>
+      </Implementation>
+    </Method>
+    <Property Name="nBatteryPercent" Id="{70242ba0-09f7-464f-8427-ab6950b4892e}">
+      <Declaration><![CDATA[PROPERTY nBatteryPercent : DWORD
+]]></Declaration>
+      <Get Name="Get" Id="{f3d7edbe-5256-46d0-8bbd-1609a6a77249}">
+        <Declaration><![CDATA[VAR
+END_VAR
+]]></Declaration>
+        <Implementation>
+          <ST><![CDATA[nBatteryPercent:=_nBatteryPercent;]]></ST>
+        </Implementation>
+      </Get>
+    </Property>
+    <LineIds Name="FB_UPS_Base">
+      <LineId Id="2" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_UPS_Base.AcknowledgePowerFailDetect">
+      <LineId Id="1" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_UPS_Base.bPowerFailDetect.Get">
+      <LineId Id="1" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_UPS_Base.bReady.Get">
+      <LineId Id="1" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_UPS_Base.bReplaceBattery.Get">
+      <LineId Id="1" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_UPS_Base.Execute">
+      <LineId Id="1" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_UPS_Base.FB_Init">
+      <LineId Id="1" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_UPS_Base.nBatteryPercent.Get">
+      <LineId Id="1" Count="0" />
+    </LineIds>
+  </POU>
+</TcPlcObject>

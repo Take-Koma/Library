@@ -42,10 +42,38 @@ END_VAR
 
 ]]></Declaration>
     <Implementation>
-      <ST><![CDATA[//---1サイクル目のみ実行---
+      <ST><![CDATA[
+]]></ST>
+    </Implementation>
+    <Method Name="AcknowledgePersistentReset" Id="{7687dfad-63a8-4491-a427-161e519e86cf}">
+      <Declaration><![CDATA[METHOD AcknowledgePersistentReset]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[//エラーフラグをリセット
+bDataLoadFault		:=FALSE;
+bDataLoadPartial	:=FALSE;
+bOldDataLoad		:=FALSE;
+bMagicMismatch		:=FALSE;
+
+//エラー出力をリセット
+bPersistentDataLoadError:=FALSE;
+fbMessage.Release();
+ipResultMessage:=0;
+
+//マジックナンバーを正値に修復
+nMagicNumber:=MAGIC_NUMBER_DEFAULT;
+
+//パーシステントデータ保存
+bWriteReq:=TRUE;]]></ST>
+      </Implementation>
+    </Method>
+    <Method Name="Execute" Id="{00ea5909-ae49-4eee-a37d-05bd8834e60a}">
+      <Declaration><![CDATA[METHOD Execute
+]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[//---1サイクル目のみ実行---
 	IF NOT bInit THEN
 		//システム情報のチェック
-		CASE _AppInfo.PersistentStatus OF
+		CASE TwinCAT_SystemInfoVarList._AppInfo.PersistentStatus OF
 			EPlcPersistentStatus.PS_All:
 				bDataLoadFault		:=FALSE;
 				bDataLoadPartial	:=FALSE;
@@ -58,7 +86,7 @@ END_VAR
 
 		END_CASE
 		
-		bOldDataLoad:=_AppInfo.OldBootData;
+		bOldDataLoad:=TwinCAT_SystemInfoVarList._AppInfo.OldBootData;
 		
 		//マジックナンバーのチェック
 		bMagicMismatch:=(nMagicNumber<>MAGIC_NUMBER_DEFAULT);
@@ -124,7 +152,7 @@ END_VAR
 
 //---パーシステントデータ書き込みFBの実行---
 	fbWritePersistentData(	NETID	:=F_CreateAmsNetId(_PcAmsNetId),
-							PORT	:=_AppInfo.AdsPort,
+							PORT	:=TwinCAT_SystemInfoVarList._AppInfo.AdsPort,
 							START	:=bStartPulse,
 							TMOUT	:=DEFAULT_ADS_TIMEOUT,
 							MODE	:=E_PersistentMode.SPDM_2PASS,
@@ -163,29 +191,7 @@ END_VAR
 	
 	//次スキャン用に BUSY 状態を記憶
 	bWritePersistentDataBusyPrev:=fbWritePersistentData.BUSY;
-
 ]]></ST>
-    </Implementation>
-    <Method Name="AcknowledgePersistentReset" Id="{7687dfad-63a8-4491-a427-161e519e86cf}">
-      <Declaration><![CDATA[METHOD AcknowledgePersistentReset
-]]></Declaration>
-      <Implementation>
-        <ST><![CDATA[//エラーフラグをリセット
-bDataLoadFault		:=FALSE;
-bDataLoadPartial	:=FALSE;
-bOldDataLoad		:=FALSE;
-bMagicMismatch		:=FALSE;
-
-//エラー出力をリセット
-bPersistentDataLoadError:=FALSE;
-fbMessage.Release();
-ipResultMessage:=0;
-
-//マジックナンバーを正値に修復
-nMagicNumber:=MAGIC_NUMBER_DEFAULT;
-
-//パーシステントデータ保存
-bWriteReq:=TRUE;]]></ST>
       </Implementation>
     </Method>
     <Method Name="FB_Init" Id="{e220c860-5388-4521-a00f-ff98ea60f3a2}">
@@ -222,24 +228,7 @@ ipResultMessage:=0;]]></ST>
       </Implementation>
     </Method>
     <LineIds Name="FB_PersistentDataManager">
-      <LineId Id="409" Count="45" />
-      <LineId Id="457" Count="6" />
-      <LineId Id="521" Count="2" />
-      <LineId Id="526" Count="0" />
-      <LineId Id="528" Count="0" />
-      <LineId Id="527" Count="0" />
-      <LineId Id="525" Count="0" />
-      <LineId Id="524" Count="0" />
-      <LineId Id="465" Count="34" />
-      <LineId Id="531" Count="6" />
-      <LineId Id="547" Count="1" />
-      <LineId Id="538" Count="6" />
-      <LineId Id="549" Count="2" />
-      <LineId Id="546" Count="0" />
-      <LineId Id="529" Count="1" />
-      <LineId Id="500" Count="0" />
-      <LineId Id="552" Count="0" />
-      <LineId Id="519" Count="1" />
+      <LineId Id="520" Count="0" />
       <LineId Id="78" Count="0" />
     </LineIds>
     <LineIds Name="FB_PersistentDataManager.AcknowledgePersistentReset">
@@ -255,6 +244,9 @@ ipResultMessage:=0;]]></ST>
       <LineId Id="25" Count="0" />
       <LineId Id="21" Count="3" />
       <LineId Id="20" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_PersistentDataManager.Execute">
+      <LineId Id="1" Count="121" />
     </LineIds>
     <LineIds Name="FB_PersistentDataManager.FB_Init">
       <LineId Id="1" Count="0" />

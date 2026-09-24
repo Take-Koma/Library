@@ -3,5 +3,53 @@
   <Itf Name="I_UPS" Id="{33a94132-25f9-4343-b0c1-8356c76610c8}">
     <Declaration><![CDATA[INTERFACE I_UPS
 ]]></Declaration>
+    <Method Name="AcknowledgePowerFailDetect" Id="{cbf25c3d-872c-42c1-a689-53b721ad3908}">
+      <Declaration><![CDATA[METHOD AcknowledgePowerFailDetect
+VAR_INPUT
+END_VAR
+]]></Declaration>
+    </Method>
+    <Property Name="bPowerFailDetect" Id="{62011832-2f10-4c2f-9378-66f04c44cb86}">
+      <Declaration><![CDATA[PROPERTY bPowerFailDetect : BOOL]]></Declaration>
+      <Get Name="Get" Id="{4d1deffd-8fa1-4cd6-87af-f30291db857d}">
+        <Declaration><![CDATA[]]></Declaration>
+      </Get>
+    </Property>
+    <Property Name="bReady" Id="{3523b9cf-358e-4258-94ce-1a7dd0389e32}">
+      <Declaration><![CDATA[PROPERTY bReady : BOOL]]></Declaration>
+      <Get Name="Get" Id="{2360b152-5be9-4593-b430-782daaa7297c}">
+        <Declaration><![CDATA[]]></Declaration>
+      </Get>
+    </Property>
+    <Property Name="bReplaceBattery" Id="{f61edeb9-2323-4ad0-86fa-6e84aad5eff3}">
+      <Declaration><![CDATA[PROPERTY bReplaceBattery : BOOL]]></Declaration>
+      <Get Name="Get" Id="{85343b49-1c3b-4c1f-879c-5ba09051755a}">
+        <Declaration><![CDATA[]]></Declaration>
+      </Get>
+    </Property>
+    <Method Name="Execute" Id="{fc9f0701-1d96-4d29-b020-71e7b468aedf}">
+      <Declaration><![CDATA[METHOD Execute
+VAR_INPUT
+END_VAR
+]]></Declaration>
+    </Method>
+    <Method Name="FB_Init" Id="{2a0a241a-4ede-4393-89ff-87add41e3020}">
+      <Declaration><![CDATA[//FB_Init は常に暗黙的に使用可能で、主に初期化に使用されます。
+//戻り値は評価されません。特定の結果を得るために、メソッドを明示的に宣言し、
+//そのメソッドに標準の初期化コードをもったコードを追加することができます。戻り値を評価できます。
+METHOD FB_Init: BOOL
+VAR_INPUT
+    bInitRetains: BOOL; // TRUE: 保持変数は初期化されます (ウォーム リセット、あるいはコールド リセット)
+    bInCopyCode: BOOL;  // TRUE: 後でコードをコピーする (オンライン変更) ために、インスタンスをコピーします。
+
+	PcAmsNetId					:AMSNETID;		//PC AMS Net ID
+END_VAR]]></Declaration>
+    </Method>
+    <Property Name="nBatteryPercent" Id="{c67a3052-491d-4174-a263-e7aad0009fd5}">
+      <Declaration><![CDATA[PROPERTY nBatteryPercent : DWORD]]></Declaration>
+      <Get Name="Get" Id="{ba3b3a9d-9dc5-4b42-8f2e-1eed4c8b8ccc}">
+        <Declaration><![CDATA[]]></Declaration>
+      </Get>
+    </Property>
   </Itf>
 </TcPlcObject>

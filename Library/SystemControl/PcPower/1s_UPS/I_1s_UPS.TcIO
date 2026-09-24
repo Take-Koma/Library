@@ -3,6 +3,12 @@
   <Itf Name="I_1s_UPS" Id="{b4b1b3e2-fd93-4da2-92d1-453053502d99}">
     <Declaration><![CDATA[INTERFACE I_1s_UPS
 ]]></Declaration>
+    <Method Name="AcknowledgePowerFailDetect" Id="{81ddd59c-e5f7-453b-8714-ef4093d04315}">
+      <Declaration><![CDATA[METHOD AcknowledgePowerFailDetect
+VAR_INPUT
+END_VAR
+]]></Declaration>
+    </Method>
     <Property Name="bPowerFailDetect" Id="{f8195a76-69b2-4f5a-93ed-cdcdf49a6394}">
       <Declaration><![CDATA[PROPERTY bPowerFailDetect : BOOL]]></Declaration>
       <Get Name="Get" Id="{92afdf7f-c298-4063-8ff0-c74db2a46fee}">
@@ -24,9 +30,20 @@
     <Method Name="Execute" Id="{37908e70-6383-4f51-be8a-bdb845ca805c}">
       <Declaration><![CDATA[METHOD Execute
 VAR_INPUT
-	PcAmsNetId	: AMSNETID;		//PC AMS Net ID
 END_VAR
 ]]></Declaration>
+    </Method>
+    <Method Name="FB_Init" Id="{f38676ad-7c84-4fd7-bae1-539d65824671}">
+      <Declaration><![CDATA[//FB_Init は常に暗黙的に使用可能で、主に初期化に使用されます。
+//戻り値は評価されません。特定の結果を得るために、メソッドを明示的に宣言し、
+//そのメソッドに標準の初期化コードをもったコードを追加することができます。戻り値を評価できます。
+METHOD FB_Init: BOOL
+VAR_INPUT
+    bInitRetains: BOOL; // TRUE: 保持変数は初期化されます (ウォーム リセット、あるいはコールド リセット)
+    bInCopyCode: BOOL;  // TRUE: 後でコードをコピーする (オンライン変更) ために、インスタンスをコピーします。
+
+	PcAmsNetId					:AMSNETID;		//PC AMS Net ID
+END_VAR]]></Declaration>
     </Method>
   </Itf>
 </TcPlcObject>

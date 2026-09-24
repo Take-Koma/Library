@@ -1,0 +1,66 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1">
+  <POU Name="FB_UPS_CU81x0_0xx0" Id="{1271138a-62b6-4969-8bf3-f7871e338543}" SpecialFunc="None">
+    <Declaration><![CDATA[FUNCTION_BLOCK FB_UPS_CU81x0_0xx0 EXTENDS FB_UPS_Base
+VAR_INPUT
+END_VAR
+VAR_OUTPUT
+END_VAR
+VAR
+	fbUps			:FB_GetUPSStatus;
+	_stUpsStatus	:ST_UPSStatus;
+END_VAR
+]]></Declaration>
+    <Implementation>
+      <ST><![CDATA[]]></ST>
+    </Implementation>
+    <Method Name="Execute" Id="{e8864bcd-5c89-408c-b4fe-4b644cc2d5e6}">
+      <Declaration><![CDATA[METHOD Execute
+]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[fbUps(	sNetId		:=SUPER^._PcAmsNetId,
+		nPort		:=0,
+		bEnable		:=TRUE,
+		bValid		=>,
+		bError		=>,
+		nErrId		=>,
+		stStatus	=>_stUpsStatus
+		);
+
+SUPER^._bReady:= fbUps.stStatus.ePowerStatus=E_UpsPowerStatus.PowerOnLine;
+
+SUPER^._bPowerFailDetect:= fbUps.stStatus.ePowerStatus=E_UpsPowerStatus.PowerOnBattery;
+
+SUPER^._bReplaceBattery:=fbUps.stStatus.eBatteryStatus=E_BatteryStatus.BatteryReplace;
+
+SUPER^._nBatteryPercent:=fbUps.stStatus.BatteryLifePercent;
+]]></ST>
+      </Implementation>
+    </Method>
+    <Property Name="stUpsStatus" Id="{13aa49ed-cf01-4f0e-9e2f-17c41c8576c9}">
+      <Declaration><![CDATA[PROPERTY stUpsStatus : ST_UPSStatus]]></Declaration>
+      <Get Name="Get" Id="{c05dad3e-48b0-4e49-8e3c-8a0ba4108add}">
+        <Declaration><![CDATA[VAR
+END_VAR
+]]></Declaration>
+        <Implementation>
+          <ST><![CDATA[stUpsStatus:=_stUpsStatus;]]></ST>
+        </Implementation>
+      </Get>
+    </Property>
+    <LineIds Name="FB_UPS_CU81x0_0xx0">
+      <LineId Id="1" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_UPS_CU81x0_0xx0.Execute">
+      <LineId Id="1" Count="11" />
+      <LineId Id="14" Count="0" />
+      <LineId Id="13" Count="0" />
+      <LineId Id="16" Count="0" />
+      <LineId Id="15" Count="0" />
+      <LineId Id="17" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_UPS_CU81x0_0xx0.stUpsStatus.Get">
+      <LineId Id="1" Count="0" />
+    </LineIds>
+  </POU>
+</TcPlcObject>
